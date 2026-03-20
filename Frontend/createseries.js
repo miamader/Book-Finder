@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // STEP 5: update the series with the coverImageKey
-      // backend route currently has typo: /api/sereies/{id}/update
+      // backend route currently has typo: /api/series/{id}/update
       const updatePayload = {
         seriesName: seriesName,
         description: description,
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
         coverImageKey: objectKey
       };
 
-      const updateResponse = await fetch(`${SERIES_API_BASE}/api/sereies/${seriesId}/update`, {
+      const updateResponse = await fetch(`${SERIES_API_BASE}/api/series/${seriesId}/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
