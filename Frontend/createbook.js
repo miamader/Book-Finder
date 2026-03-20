@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const response = await fetch(`${BOOKS_API_BASE}/api/books`, {
+      const response = await fetch(`${BOOKS_API_BASE}/api/books/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
