@@ -1,4 +1,4 @@
-const API_BASE = "https://book-finder-production-5c8b.up.railway.app";
+const SERIES_API_BASE = "https://book-finder-production-5c8b.up.railway.app";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("seriesForm");
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const response = await fetch(`${API_BASE}/api/series/create`, {
+      const response = await fetch(`${SERIES_API_BASE}/api/series/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
