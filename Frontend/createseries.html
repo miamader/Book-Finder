@@ -22,15 +22,20 @@
 
         <section class="cb-cover" aria-label="Series cover upload">
             <div class="cb-cover-box">
-                <div class="cb-cover-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="44" height="44" fill="none">
-                        <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-11Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M9 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z" fill="currentColor"/>
-                        <path d="M5.5 18l5.2-5.2a1.5 1.5 0 0 1 2.1 0L18.5 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+
+                <div id="seriesCoverPlaceholder" class="cb-cover-placeholder">
+                    <div class="cb-cover-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="44" height="44" fill="none">
+                            <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-11Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z" fill="currentColor"/>
+                            <path d="M5.5 18l5.2-5.2a1.5 1.5 0 0 1 2.1 0L18.5 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <p class="cb-cover-text">Add a series cover</p>
                 </div>
 
-                <p class="cb-cover-text">Add a series cover</p>
+                <img id="seriesCoverPreview" class="cb-cover-preview" alt="Series cover preview" />
 
                 <label class="cb-cover-btn">
                     Upload

@@ -4,19 +4,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("seriesForm");
   const coverInput = document.getElementById("seriesCoverInput");
   const coverName = document.getElementById("seriesCoverName");
+  const coverPreview = document.getElementById("seriesCoverPreview");
+  const coverPlaceholder = document.getElementById("seriesCoverPlaceholder");
 
   if (!form) {
     console.error("Series form not found");
     return;
   }
 
-  if (coverInput && coverName) {
+  if (coverInput) {
     coverInput.addEventListener("change", () => {
-      if (coverInput.files.length > 0) {
-        coverName.textContent = coverInput.files[0].name;
-      } else {
+      const file = coverInput.files[0];
+
+      if (!file) {
         coverName.textContent = "";
+        coverPreview.src = "";
+        coverPreview.style.display = "none";
+        coverPlaceholder.style.display = "flex";
+        return;
       }
+
+      coverName.textContent = file.name;
+
+      const previewUrl = URL.createObjectURL(file);
+      coverPreview.src = previewUrl;
+      coverPreview.style.display = "block";
+      coverPlaceholder.style.display = "none";
     });
   }
 

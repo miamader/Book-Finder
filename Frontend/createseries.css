@@ -224,3 +224,24 @@ body{
     grid-template-columns: 1fr;
   }
 }
+
+.cb-cover-box {
+  position: relative;
+}
+
+.cb-cover-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cb-cover-preview {
+  display: none;
+  width: 100%;
+  max-width: 220px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
