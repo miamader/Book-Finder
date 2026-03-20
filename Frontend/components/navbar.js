@@ -42,6 +42,7 @@ class BookFinderNav extends HTMLElement {
 
         <div class="nav-right">
           <a class="nav-write-btn" href="createbook.html">Write</a>
+          <a class="nav-write-btn" href="createseries.html">New Series</a>
 
           <button class="nav-icon-btn" type="button" aria-label="Notifications">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
