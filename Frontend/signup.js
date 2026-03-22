@@ -1,3 +1,5 @@
+const API_BASE = "https://book-finder-production-5c8b.up.railway.app";
+
 const signupForm = document.getElementById('signupForm');
 
 signupForm.addEventListener('submit', async (e) => {
@@ -8,12 +10,13 @@ signupForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:8080/api/auth/signup', {
+        const response = await fetch(`${API_BASE}/api/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, 
-                email, 
-                password, 
+            body: JSON.stringify({
+                username,
+                email,
+                password,
             })
         });
 

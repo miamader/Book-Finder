@@ -8,12 +8,14 @@ import com.author.book_finder.book.repository.BookRepository;
 import com.author.book_finder.book.dto.BookCreateRequestDTO;
 import com.author.book_finder.book.dto.BookDetailsDTO;
 import com.author.book_finder.book.dto.BookResponseDTO;
+import com.author.book_finder.book.specification.BookSpecifications;
 import com.author.book_finder.chapter.entity.Chapter;
 import com.author.book_finder.book.entity.Book;
 import com.author.book_finder.genre.entity.Genre;
 import com.author.book_finder.genre.repository.GenreRepository;
 import com.author.book_finder.hashtag.entity.Hashtag;
 import com.author.book_finder.hashtag.repository.HashtagRepository;
+import com.author.book_finder.search.dto.SearchRequestDTO;
 import com.author.book_finder.security.SecurityUtil;
 import com.author.book_finder.series.entity.Series;
 import com.author.book_finder.series.repository.SeriesRepository;
@@ -21,7 +23,9 @@ import com.author.book_finder.infrastructure.aws.S3Service;
 import com.author.book_finder.user.entity.User;
 import com.author.book_finder.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,6 +178,31 @@ public class BookService {
         if (series != null) {
             renumberVolumesInSeries(series);
         }
+    }
+
+    // SEARCH FEATURE
+    public Page<BookResponseDTO> searchBooks(SearchRequestDTO request) {
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getSize()
+        );
+
+        Specification<Book> spec = Specification.allOf();
+
+        spec = spec.and(BookSpecifications.keywordSearch(request.getKeyword()));
+
+        spec = spec.and(BookSpecifications.hasGenres(request.getGenres()));
+
+        spec = spec.and(BookSpecifications.hasHashtags(request.getHashtags()));
+
+        spec = spec.and(BookSpecifications.belongsToSeries(request.getSeriesId()));
+
+        spec = spec.and(BookSpecifications.belongsToUser(request.getUserId()));
+
+        Page<Book> books = bookRepository.findAll(spec, pageable);
+
+        return books.map(bookMapper::toResponseDTO);
     }
 
     // HELPER METHODS

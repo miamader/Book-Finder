@@ -1,5 +1,6 @@
 package com.author.book_finder.series.service;
 
+import com.author.book_finder.series.dto.BooksInSeriesDTO;
 import com.author.book_finder.series.dto.SeriesCreateRequestDTO;
 import com.author.book_finder.series.dto.SeriesDetailsDTO;
 import com.author.book_finder.series.dto.SeriesResponseDTO;

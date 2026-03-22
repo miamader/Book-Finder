@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookFinder | Create a Series</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="./createseries.css" />
+
+    <script src="components/navbar.js" defer></script>
+    <script src="./createseries.js" defer></script>
+</head>
+<body class="cb-body">
+<bf-navbar active="mybooks"></bf-navbar>
+
+<main class="cb-main">
+    <div class="cb-wrap">
+
+        <section class="cb-cover" aria-label="Series cover upload">
+            <div class="cb-cover-box">
+
+                <div id="seriesCoverPlaceholder" class="cb-cover-placeholder">
+                    <div class="cb-cover-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="44" height="44" fill="none">
+                            <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-11Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 10a2 2 0 1 0 0-4a2 2 0 0 0 0 4Z" fill="currentColor"/>
+                            <path d="M5.5 18l5.2-5.2a1.5 1.5 0 0 1 2.1 0L18.5 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <p class="cb-cover-text">Add a series cover</p>
+                </div>
+
+                <img id="seriesCoverPreview" class="cb-cover-preview" alt="Series cover preview" />
+
+                <label class="cb-cover-btn">
+                    Upload
+                    <input id="seriesCoverInput" type="file" accept="image/png, image/jpeg" hidden />
+                </label>
+
+                <p id="seriesCoverName" class="cb-cover-text"></p>
+
+                <button class="cb-help-dot" type="button" aria-label="Cover help">i</button>
+            </div>
+        </section>
+
+        <section class="cb-card" aria-label="Series details form">
+            <div class="cb-card-inner">
+                <h2 class="cb-card-title">Series Details</h2>
+                <div class="cb-divider"></div>
+
+                <form class="cb-form" id="seriesForm">
+
+                    <div class="cb-field">
+                        <label class="cb-label" for="seriesName">Series Name</label>
+                        <input id="seriesName" class="cb-input" type="text" placeholder="Untitled Series" />
+                    </div>
+
+                    <div class="cb-field">
+                        <div class="cb-label-row">
+                            <label class="cb-label" for="seriesDesc">Description</label>
+                            <span class="cb-info" title="Tell readers what this series is about">i</span>
+                        </div>
+                        <textarea id="seriesDesc" class="cb-textarea" placeholder=""></textarea>
+                    </div>
+
+                    <div class="cb-actions">
+                        <button class="cb-next" type="submit">Create Series →</button>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
+    </div>
+</main>
+</body>
+</html>

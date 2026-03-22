@@ -1,3 +1,6 @@
+server:
+  port: ${PORT:8080}
+
 spring:
   config:
     import: "optional:file:.env[.properties]"
@@ -5,15 +8,19 @@ spring:
     name: book_finder
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/bf_database
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver # Good to add for clarity
+    # Priority: Railway Variable -> Local Docker -> Local H2 (if needed)
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bf_database}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
     enabled: true

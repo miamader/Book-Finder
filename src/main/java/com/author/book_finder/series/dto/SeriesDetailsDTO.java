@@ -1,7 +1,5 @@
 package com.author.book_finder.series.dto;
 
-import com.author.book_finder.series.service.BooksInSeriesDTO;
-
 import java.time.LocalDate;
 import java.util.List;
 

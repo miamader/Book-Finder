@@ -1,19 +1,21 @@
+const API_BASE = "https://book-finder-production-5c8b.up.railway.app";
+
 class BookFinderNav extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <header class="nav-bar">
         <div class="nav-left">
 
-          <div class="nav-brand">
+          <a class="nav-brand" href="index.html">
             <img src="svg_files/bookfinder logo.svg" alt="BookFinder Logo" class="nav-logo">
             <span class="nav-brand-text">BookFinder</span>
-          </div>
+          </a>
 
           <nav class="nav-links" aria-label="Primary">
             <a class="nav-link" href="index.html"     data-page="home">Home</a>
             <a class="nav-link" href="dashboard.html"   data-page="mybooks">My Books</a>
-            <a class="nav-link" href="browse.html"    data-page="browse">Browse</a>
-            <a class="nav-link" href="community.html" data-page="community">Community</a>
+            <a class="nav-link" href="search.html" data-page="browse">Browse</a>
+            <!-- <a class="nav-link" href="community.html" data-page="community">Community</a> -->
           </nav>
 
         </div>
@@ -40,6 +42,7 @@ class BookFinderNav extends HTMLElement {
 
         <div class="nav-right">
           <a class="nav-write-btn" href="createbook.html">Write</a>
+          <a class="nav-write-btn" href="createseries.html">New Series</a>
 
           <button class="nav-icon-btn" type="button" aria-label="Notifications">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
@@ -55,7 +58,7 @@ class BookFinderNav extends HTMLElement {
               <div class="nav-dropdown-name">User</div>
               <div class="nav-dropdown-divider"></div>
               <a class="nav-dropdown-item" href="profile.html">My Profile</a>
-              <a class="nav-dropdown-item" href="settings.html">Account Settings</a>
+              <!-- <a class="nav-dropdown-item" href="settings.html">Account Settings</a> -->
               <div class="nav-dropdown-divider"></div>
               <button class="nav-dropdown-item nav-signout" id="signout-btn">Sign Out</button>
             </div>
@@ -94,20 +97,23 @@ class BookFinderNav extends HTMLElement {
       avatar.setAttribute('aria-expanded', 'false');
     });
 
-    // sign out 
     this.querySelector('#signout-btn').addEventListener('click', () => {
       localStorage.removeItem('username');
+      localStorage.removeItem('token');
       window.location.href = 'login.html';
     });
   }
 
   async loadCurrentUser() {
     const nameEl = this.querySelector('.nav-dropdown-name');
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
     try {
-      // Calls GET /api/users/me — to get current user
-      const response = await fetch('/api/users/me', {
-        credentials: 'include'  
+      const response = await fetch(`${API_BASE}/api/users/me`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {
@@ -116,17 +122,14 @@ class BookFinderNav extends HTMLElement {
 
       const user = await response.json();
 
-      // use firstName + lastName if available, fall back to username
       const displayName = user.firstName
         ? `${user.firstName} ${user.lastName ?? ''}`.trim()
         : user.username;
 
       nameEl.textContent = displayName;
-
       localStorage.setItem('username', displayName);
 
     } catch (err) {
-      // network error or Spring isn't running then keep default username
       console.warn('Could not load current user:', err);
     }
   }

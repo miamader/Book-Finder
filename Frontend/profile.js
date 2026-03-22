@@ -1,18 +1,16 @@
+const API_BASE = "https://book-finder-production-5c8b.up.railway.app";
+
 /* --current user data--
-   TODO: replace this object with the real API / session data once implemented
-   note: empty strings will trigger defaults 
+   temporary fallback object
 ------------------------------------------------------------------------------------*/
 var currentUser = {
   username:   "Username1",
-  firstName:  "",          // empty → shows "Firstname Lastname"
+  firstName:  "",
   lastName:   "",
-  avatarUrl:  "",          // empty → shows icon placeholder
+  avatarUrl:  "",
   joinedDate: "Feb 2026",
-  bio:        "",          // empty → shows fallback message
-  books: []                // empty → shows 1 blank card
-
-  // example of a book entry:
-  // { title: "Pride & Prejudice", author: "Jane Austen", coverUrl: "https://..." }
+  bio:        "",
+  books: []
 };
 
 /* -carousel settings- */
@@ -22,7 +20,6 @@ var currentIndex = 0;
 
 /* -render user profile- */
 function renderProfile(user) {
-
   document.getElementById("profileUsername").textContent =
     user.username || "Username1";
 
@@ -65,7 +62,6 @@ function renderBooks(books) {
   dotsWrap.innerHTML = "";
   currentIndex       = 0;
 
-  // **make sure to always show 1 placeholder book even if user has no books
   var displayBooks = books.length > 0 ? books : [null];
 
   displayBooks.forEach(function(book) {
@@ -102,7 +98,6 @@ function renderBooks(books) {
       card.appendChild(author);
 
     } else {
-      // placeholder book
       card.innerHTML =
         '<div class="book-cover empty">' +
           '<svg width="48" height="48" fill="none" stroke="#999" stroke-width="1.2" viewBox="0 0 24 24">' +
@@ -117,7 +112,6 @@ function renderBooks(books) {
     track.appendChild(card);
   });
 
-  // page dots
   var pages = Math.max(1, Math.ceil(displayBooks.length / VISIBLE));
   for (var p = 0; p < pages; p++) {
     (function(pageIndex) {
@@ -131,7 +125,6 @@ function renderBooks(books) {
   updateCarousel();
 }
 
-/* -carousel navigation- */
 function goTo(page) {
   var displayBooks = currentUser.books.length > 0 ? currentUser.books : [null];
   var pages = Math.ceil(displayBooks.length / VISIBLE);
@@ -163,5 +156,45 @@ document.getElementById("nextBtn").addEventListener("click", function() {
   goTo(currentIndex + 1);
 });
 
-/* render 'init' */
-renderProfile(currentUser);
+async function loadCurrentUserProfile() {
+  var token = localStorage.getItem("token");
+
+  if (!token) {
+    renderProfile(currentUser);
+    return;
+  }
+
+  try {
+    var response = await fetch(`${API_BASE}/api/users/me`, {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    if (!response.ok) {
+      renderProfile(currentUser);
+      return;
+    }
+
+    var user = await response.json();
+
+    currentUser = {
+      username: user.username || "Username1",
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      avatarUrl: user.avatarUrl || "",
+      joinedDate: user.joinDate || "—",
+      bio: user.bio || "",
+      books: user.books || []
+    };
+
+    renderProfile(currentUser);
+
+  } catch (error) {
+    console.error("Error loading profile:", error);
+    renderProfile(currentUser);
+  }
+}
+
+/* render init */
+loadCurrentUserProfile();

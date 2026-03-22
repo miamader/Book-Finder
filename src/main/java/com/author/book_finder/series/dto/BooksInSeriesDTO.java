@@ -1,4 +1,4 @@
-package com.author.book_finder.series.service;
+package com.author.book_finder.series.dto;
 
 public class BooksInSeriesDTO {
 

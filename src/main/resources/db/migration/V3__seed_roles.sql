@@ -1,4 +1,3 @@
-INSERT INTO roles (role_name) VALUES
-                                  ('ROLE_USER'),
-                                  ('ROLE_ADMIN')
-ON CONFLICT DO NOTHING;
+INSERT INTO roles (role_name)
+VALUES ('ROLE_USER'),
+       ('ROLE_ADMIN') ON CONFLICT DO NOTHING;
