@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Finder | Chapter View</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- styles -->
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+
+    <link rel="stylesheet" href="chapterview.css"/>
+    <!-- components -->
+    <script src="components/navbar.js" defer></script>
+</head>
+
+<body>
+ <bf-navbar active="browse"></bf-navbar>
+
+    <div class="page-container">
+
+    <h1 class="book-title" id="readerBookTitle">BookTitle</h1>
+ 
+    <!-- author + year published -->
+    <div class="author-row">
+      <div class="author-avatar" id="readerAuthorAvatar">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+      <div class="author-meta">
+        <span class="author-label">Written By</span>
+        <span class="author-name" id="readerAuthorName">—</span>
+      </div>
+      <div class="year-meta">
+        <span class="author-label">Year</span>
+        <span class="author-name" id="readerYear">—</span>
+      </div>
+    </div>
+ 
+    <!-- Book-level status tags -->
+    <div class="status-tags" id="readerStatusTags"></div>
+ 
+    <div class="chapter-card">
+ 
+      <!-- card header with title and read/unread -->
+      <div class="chapter-card-header">
+        <h2 class="chapter-heading" id="chapterHeading">—</h2>
+   
+        <span class="chapter-read-badge" id="chapterReadBadge">Unread</span>
+      </div>
+ 
+      <!-- loading chapter if needed* -->
+      <p class="loading-msg" id="loadingMsg">Loading chapter...</p>
+ 
+      <!-- chapter text inserted here by chapter-view.js -->
+      <div class="chapter-content" id="chapterContent"></div>
+ 
+    </div>
+ 
+    <!-- bottom nav -->
+    <div class="chapter-nav">
+      <button class="btn-prev-part" id="btnPrev" disabled onclick="goToPrev()">
+        ← Previous Part
+      </button>
+      <button class="btn-next-part" id="btnNext" disabled onclick="goToNext()">
+        Read the Next Part ›
+      </button>
+    </div>
+ 
+    <!-- back button -->
+    <div class="toc-link-wrap">
+      <a class="btn-toc-link" id="tocLink" href="tableofcontents.html">← Table of Contents</a>
+    </div>
+
+  </div>
+
+    <script src="chapterview.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Finder | Table of Contents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- styles -->
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+
+    <link rel="stylesheet" href="tableofcontents.css"/>
+    <!-- components -->
+    <script src="components/navbar.js" defer></script>
+</head>
+
+<body>
+ <bf-navbar active="browse"></bf-navbar>
+
+    <div class="page-container">
+
+    <h1 class="book-title" id="tocBookTitle">BookTitle</h1>
+
+    <!-- author + year -->
+    <div class="author-row">
+      <div class="author-avatar" id="tocAuthorAvatar">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+      <div class="author-meta">
+        <span class="author-label">Written By</span>
+        <span class="author-name" id="tocAuthorName">—</span>
+      </div>
+      <div class="year-meta">
+        <span class="author-label">Year</span>
+        <span class="author-name" id="tocYear">—</span>
+      </div>
+    </div>
+ 
+    <!-- status tags (ongoing, completed, etc) -->
+    <div class="status-tags" id="tocStatusTags"></div>
+ 
+    <!-- table of contents cafrd -->
+    <div class="toc-card">
+      <div class="toc-heading">Table of Contents</div>
+      <!-- chapter rows are inserted here by table-of-contents.js -->
+      <ul class="chapter-list" id="chapterList">
+        <li class="loading-msg">Loading chapters...</li>
+      </ul>
+    </div>
+
+  </div>
+
+    <script src="tableofcontents.js"></script>
+</body>
+</html>
