@@ -73,25 +73,20 @@ function renderBooks(books) {
       cover.className = "book-cover";
 
       var img = document.createElement("img");
-      img.src = book.coverUrl;
-      img.alt = book.title;
+      img.src = book.coverUrl || "svg_files/bookfinder logo.svg";
+      img.alt = book.title || "Book cover";
       img.onerror = function() {
-        cover.classList.add("empty");
-        cover.innerHTML =
-          '<svg width="48" height="48" fill="none" stroke="#999" stroke-width="1.2" viewBox="0 0 24 24">' +
-          '<rect x="3" y="2" width="13" height="20" rx="1"/>' +
-          '<path d="M7 6h5M7 10h5M7 14h3"/>' +
-          '</svg>';
+        img.src = "svg_files/bookfinder logo.svg";
       };
       cover.appendChild(img);
 
       var title = document.createElement("div");
       title.className = "book-title";
-      title.textContent = book.title;
+      title.textContent = book.title || "Untitled";
 
       var author = document.createElement("div");
       author.className = "book-author";
-      author.textContent = book.author;
+      author.textContent = book.authorUsername || "Unknown author";
 
       card.appendChild(cover);
       card.appendChild(title);
