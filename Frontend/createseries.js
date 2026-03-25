@@ -527,22 +527,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       await updateSeries(seriesId, basePayload, token);
 
-      if (isEditMode) {
-        await refreshSeriesBooks(token);
-        await refreshStandaloneBooks(token);
-
-        if (selectedFile) {
-          currentSeriesData = await fetchSeriesDetails(seriesId, token);
-          if (currentSeriesData.coverUrl) {
-            showExistingCover(currentSeriesData.coverUrl);
-          }
-        }
-
-        alert("Series updated successfully!");
-      } else {
-        alert("Series created successfully!");
-        window.location.href = `createseries.html?seriesId=${seriesId}`;
-      }
+  if (isEditMode) {
+    alert("Series updated successfully!");
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Series created successfully!");
+    window.location.href = `createseries.html?seriesId=${seriesId}`;
+  }
     } catch (error) {
       console.error("Error saving series:", error);
       alert(error.message || "Error saving series.");
