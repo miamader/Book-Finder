@@ -12,10 +12,9 @@ class BookFinderNav extends HTMLElement {
           </a>
 
           <nav class="nav-links" aria-label="Primary">
-            <a class="nav-link" href="index.html"     data-page="home">Home</a>
-            <a class="nav-link" href="dashboard.html"   data-page="mybooks">My Books</a>
+            <a class="nav-link" href="index.html" data-page="home">Home</a>
+            <a class="nav-link" href="dashboard.html" data-page="mybooks">My Books</a>
             <a class="nav-link" href="search.html" data-page="browse">Browse</a>
-            <!-- <a class="nav-link" href="community.html" data-page="community">Community</a> -->
           </nav>
 
         </div>
@@ -41,8 +40,16 @@ class BookFinderNav extends HTMLElement {
         </div>
 
         <div class="nav-right">
-          <a class="nav-write-btn" href="createbook.html">Write</a>
-          <a class="nav-write-btn" href="createseries.html">New Series</a>
+          <div class="nav-write-wrapper">
+            <button class="nav-write-btn nav-write-toggle" type="button" aria-expanded="false">
+              Write
+            </button>
+
+            <div class="nav-write-dropdown" hidden>
+              <a class="nav-write-dropdown-item" href="createbook.html">New Book</a>
+              <a class="nav-write-dropdown-item" href="createseries.html">New Series</a>
+            </div>
+          </div>
 
           <button class="nav-icon-btn" type="button" aria-label="Notifications">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
@@ -58,7 +65,6 @@ class BookFinderNav extends HTMLElement {
               <div class="nav-dropdown-name">User</div>
               <div class="nav-dropdown-divider"></div>
               <a class="nav-dropdown-item" href="profile.html">My Profile</a>
-              <!-- <a class="nav-dropdown-item" href="settings.html">Account Settings</a> -->
               <div class="nav-dropdown-divider"></div>
               <button class="nav-dropdown-item nav-signout" id="signout-btn">Sign Out</button>
             </div>
@@ -70,6 +76,7 @@ class BookFinderNav extends HTMLElement {
 
     this.highlightActive();
     this.setupDropdown();
+    this.setupWriteDropdown();
     this.loadCurrentUser();
   }
 
@@ -82,8 +89,10 @@ class BookFinderNav extends HTMLElement {
   }
 
   setupDropdown() {
-    const avatar   = this.querySelector('.nav-avatar');
+    const avatar = this.querySelector('.nav-avatar');
     const dropdown = this.querySelector('.nav-dropdown');
+
+    if (!avatar || !dropdown) return;
 
     avatar.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -97,17 +106,43 @@ class BookFinderNav extends HTMLElement {
       avatar.setAttribute('aria-expanded', 'false');
     });
 
-    this.querySelector('#signout-btn').addEventListener('click', () => {
-      localStorage.removeItem('username');
-      localStorage.removeItem('token');
-      window.location.href = 'login.html';
+    const signoutBtn = this.querySelector('#signout-btn');
+    if (signoutBtn) {
+      signoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('username');
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+      });
+    }
+  }
+
+  setupWriteDropdown() {
+    const toggle = this.querySelector('.nav-write-toggle');
+    const menu = this.querySelector('.nav-write-dropdown');
+
+    if (!toggle || !menu) return;
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = !menu.hidden;
+      menu.hidden = isOpen;
+      toggle.setAttribute('aria-expanded', String(!isOpen));
+    });
+
+    menu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', () => {
+      menu.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
     });
   }
 
   async loadCurrentUser() {
     const nameEl = this.querySelector('.nav-dropdown-name');
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token || !nameEl) return;
 
     try {
       const response = await fetch(`${API_BASE}/api/users/me`, {
@@ -116,19 +151,15 @@ class BookFinderNav extends HTMLElement {
         }
       });
 
-      if (!response.ok) {
-        return;
-      }
+      if (!response.ok) return;
 
       const user = await response.json();
-
       const displayName = user.firstName
         ? `${user.firstName} ${user.lastName ?? ''}`.trim()
         : user.username;
 
       nameEl.textContent = displayName;
       localStorage.setItem('username', displayName);
-
     } catch (err) {
       console.warn('Could not load current user:', err);
     }
