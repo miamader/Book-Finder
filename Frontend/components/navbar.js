@@ -48,6 +48,8 @@ class BookFinderNav extends HTMLElement {
             <div class="nav-write-dropdown" hidden>
               <a class="nav-write-dropdown-item" href="createbook.html">New Book</a>
               <a class="nav-write-dropdown-item" href="createseries.html">New Series</a>
+              <a class="nav-write-dropdown-item" href="managebooks.html">Edit Books</a>
+              <a class="nav-write-dropdown-item" href="manageseries.html">Edit Series</a>
             </div>
           </div>
 
@@ -89,65 +91,65 @@ class BookFinderNav extends HTMLElement {
   }
 
   setupDropdown() {
-    const avatar = this.querySelector('.nav-avatar');
-    const dropdown = this.querySelector('.nav-dropdown');
+    const avatar = this.querySelector(".nav-avatar");
+    const dropdown = this.querySelector(".nav-dropdown");
 
     if (!avatar || !dropdown) return;
 
-    avatar.addEventListener('click', (e) => {
+    avatar.addEventListener("click", (e) => {
       e.stopPropagation();
       const isOpen = !dropdown.hidden;
       dropdown.hidden = isOpen;
-      avatar.setAttribute('aria-expanded', String(!isOpen));
+      avatar.setAttribute("aria-expanded", String(!isOpen));
     });
 
-    document.addEventListener('click', () => {
+    document.addEventListener("click", () => {
       dropdown.hidden = true;
-      avatar.setAttribute('aria-expanded', 'false');
+      avatar.setAttribute("aria-expanded", "false");
     });
 
-    const signoutBtn = this.querySelector('#signout-btn');
+    const signoutBtn = this.querySelector("#signout-btn");
     if (signoutBtn) {
-      signoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('username');
-        localStorage.removeItem('token');
-        window.location.href = 'login.html';
+      signoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("username");
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
       });
     }
   }
 
   setupWriteDropdown() {
-    const toggle = this.querySelector('.nav-write-toggle');
-    const menu = this.querySelector('.nav-write-dropdown');
+    const toggle = this.querySelector(".nav-write-toggle");
+    const menu = this.querySelector(".nav-write-dropdown");
 
     if (!toggle || !menu) return;
 
-    toggle.addEventListener('click', (e) => {
+    toggle.addEventListener("click", (e) => {
       e.stopPropagation();
       const isOpen = !menu.hidden;
       menu.hidden = isOpen;
-      toggle.setAttribute('aria-expanded', String(!isOpen));
+      toggle.setAttribute("aria-expanded", String(!isOpen));
     });
 
-    menu.addEventListener('click', (e) => {
+    menu.addEventListener("click", (e) => {
       e.stopPropagation();
     });
 
-    document.addEventListener('click', () => {
+    document.addEventListener("click", () => {
       menu.hidden = true;
-      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute("aria-expanded", "false");
     });
   }
 
   async loadCurrentUser() {
-    const nameEl = this.querySelector('.nav-dropdown-name');
+    const nameEl = this.querySelector(".nav-dropdown-name");
     const token = localStorage.getItem("token");
     if (!token || !nameEl) return;
 
     try {
       const response = await fetch(`${API_BASE}/api/users/me`, {
         headers: {
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       });
 
@@ -155,13 +157,13 @@ class BookFinderNav extends HTMLElement {
 
       const user = await response.json();
       const displayName = user.firstName
-        ? `${user.firstName} ${user.lastName ?? ''}`.trim()
+        ? `${user.firstName} ${user.lastName ?? ""}`.trim()
         : user.username;
 
       nameEl.textContent = displayName;
-      localStorage.setItem('username', displayName);
+      localStorage.setItem("username", displayName);
     } catch (err) {
-      console.warn('Could not load current user:', err);
+      console.warn("Could not load current user:", err);
     }
   }
 }
