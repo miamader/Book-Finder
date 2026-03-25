@@ -48,8 +48,8 @@ class BookFinderNav extends HTMLElement {
             <div class="nav-write-dropdown" hidden>
               <a class="nav-write-dropdown-item" href="createbook.html">New Book</a>
               <a class="nav-write-dropdown-item" href="createseries.html">New Series</a>
-              <a class="nav-write-dropdown-item" href="managebooks.html">Edit Books</a>
-              <a class="nav-write-dropdown-item" href="manageseries.html">Edit Series</a>
+              <a class="nav-write-dropdown-item" href="managebooks.html">Manage Books</a>
+              <a class="nav-write-dropdown-item" href="manageseries.html">Manage Series</a>
             </div>
           </div>
 
