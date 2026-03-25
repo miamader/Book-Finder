@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (isEditMode) {
     alert("Series updated successfully!");
-    window.location.href = "dashboard.html";
+    window.location.href = "manageseries.html";
   } else {
     alert("Series created successfully!");
     window.location.href = `createseries.html?seriesId=${seriesId}`;
