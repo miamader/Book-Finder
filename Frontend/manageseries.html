@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookFinder | Manage Series</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="manageseries.css" />
+    <script src="components/navbar.js" defer></script>
+    <script src="manageseries.js" defer></script>
+</head>
+<body>
+<bf-navbar active="mybooks"></bf-navbar>
+
+<main class="ms-main">
+    <div class="ms-wrap">
+        <section class="ms-hero">
+            <div>
+                <h1 class="ms-title">Manage Series</h1>
+                <p class="ms-subtitle">View and edit all the series you own.</p>
+            </div>
+
+            <a class="ms-create-btn" href="createseries.html">+ New Series</a>
+        </section>
+
+        <section class="ms-stats">
+            <div class="ms-stat-card">
+                <p class="ms-stat-label">Total Series</p>
+                <p class="ms-stat-value" id="statTotalSeries">0</p>
+            </div>
+            <div class="ms-stat-card">
+                <p class="ms-stat-label">Total Books</p>
+                <p class="ms-stat-value" id="statTotalBooks">0</p>
+            </div>
+            <div class="ms-stat-card">
+                <p class="ms-stat-label">Empty Series</p>
+                <p class="ms-stat-value" id="statEmptySeries">0</p>
+            </div>
+            <div class="ms-stat-card">
+                <p class="ms-stat-label">With Covers</p>
+                <p class="ms-stat-value" id="statWithCovers">0</p>
+            </div>
+        </section>
+
+        <section class="ms-toolbar-card">
+            <div class="ms-toolbar">
+                <input
+                        id="searchInput"
+                        class="ms-search"
+                        type="text"
+                        placeholder="Search series by name..."
+                />
+
+                <select id="sortFilter" class="ms-select">
+                    <option value="NEWEST">Newest first</option>
+                    <option value="OLDEST">Oldest first</option>
+                    <option value="NAME_ASC">Name A–Z</option>
+                    <option value="BOOKS_DESC">Most books</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="ms-list-card">
+            <div class="ms-list-head">
+                <h2 class="ms-list-title">Your Series</h2>
+                <p class="ms-list-summary" id="seriesSummary">Loading series...</p>
+            </div>
+
+            <div id="seriesGrid" class="ms-grid"></div>
+
+            <div id="seriesEmpty" class="ms-empty" hidden>
+                <p class="ms-empty-title">No series found</p>
+                <p class="ms-empty-text">Try changing your search, or create your first series.</p>
+                <a class="ms-empty-btn" href="createseries.html">Create Series</a>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>
