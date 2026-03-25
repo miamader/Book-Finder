@@ -87,10 +87,16 @@
 
                     <div id="seriesBooksList" class="series-books-list" hidden></div>
 
-                    <div id="seriesBooksActions" class="cb-actions" hidden>
-                        <button id="addBookToSeriesBtn" class="cb-next cb-next-disabled" type="button" disabled>
+                    <div id="seriesBooksActions" class="series-books-actions" hidden>
+                        <button id="toggleAddBooksBtn" class="cb-next" type="button">
                             Add Book to Series
                         </button>
+                    </div>
+
+                    <div id="standaloneBooksPanel" class="standalone-books-panel" hidden>
+                        <h3 class="series-subtitle">Standalone Books</h3>
+                        <p id="standaloneBooksHelper" class="cb-note">Select a standalone book to add it to this series.</p>
+                        <div id="standaloneBooksList" class="series-books-list"></div>
                     </div>
                 </div>
             </section>

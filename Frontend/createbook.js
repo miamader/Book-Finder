@@ -39,6 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const booksHelper = document.getElementById("seriesBooksHelper");
   const booksList = document.getElementById("seriesBooksList");
   const booksActions = document.getElementById("seriesBooksActions");
+  const toggleAddBooksBtn = document.getElementById("toggleAddBooksBtn");
+  const standaloneBooksPanel = document.getElementById("standaloneBooksPanel");
+  const standaloneBooksList = document.getElementById("standaloneBooksList");
 
   if (!form) {
     console.error("Series form not found");
@@ -52,17 +55,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentSeriesData = null;
 
 function setModeUI() {
-  if (isEditMode) {
-    document.title = "BookFinder | Edit Series";
-    formTitle.textContent = "Edit Series";
-    submitBtn.textContent = "Save Changes →";
-    booksActions.hidden = false;
-  } else {
-    document.title = "BookFinder | Create a Series";
-    formTitle.textContent = "Create Series";
-    submitBtn.textContent = "Create Series →";
-    setBooksSectionCreateMode();
+if (isEditMode) {
+  const token = getTokenOrRedirect();
+  if (!token) return;
+
+  try {
+    currentSeriesData = await fetchSeriesDetails(seriesIdFromUrl, token);
+
+    seriesNameInput.value = currentSeriesData.seriesName ?? "";
+    seriesDescInput.value = currentSeriesData.description ?? "";
+
+    if (currentSeriesData.coverUrl) {
+      showExistingCover(currentSeriesData.coverUrl);
+    }
+
+    renderSeriesBooks(currentSeriesData.booksInSeries ?? []);
+    await refreshStandaloneBooks(token);
+  } catch (error) {
+    console.error("Could not load series data:", error);
+    alert(error.message || "Could not load series data.");
   }
+}
 }
 
   function showExistingCover(coverUrl) {
@@ -85,6 +98,8 @@ function setModeUI() {
     booksList.hidden = true;
     booksList.innerHTML = "";
     booksActions.hidden = true;
+    standaloneBooksPanel.hidden = true;
+    standaloneBooksList.innerHTML = "";
   }
 
   function renderSeriesBooks(books) {
@@ -106,10 +121,13 @@ function setModeUI() {
       const card = document.createElement("div");
       card.className = "series-book-card";
 
+      const left = document.createElement("div");
+      left.className = "series-book-left";
+
       const cover = document.createElement("img");
       cover.className = "series-book-cover";
       cover.alt = `${book.title ?? "Book"} cover`;
-      cover.src = book.coverUrl || "svg_files/bookfinder logo.svg";
+      cover.src = "svg_files/bookfinder logo.svg";
 
       const meta = document.createElement("div");
       meta.className = "series-book-meta";
@@ -131,8 +149,24 @@ function setModeUI() {
       meta.appendChild(title);
       meta.appendChild(sub);
 
-      card.appendChild(cover);
-      card.appendChild(meta);
+      left.appendChild(cover);
+      left.appendChild(meta);
+
+      const right = document.createElement("div");
+      right.className = "series-book-right";
+
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "series-book-btn";
+      removeBtn.textContent = "Remove";
+      removeBtn.addEventListener("click", async () => {
+        await handleRemoveBookFromSeries(book.bookId);
+      });
+
+      right.appendChild(removeBtn);
+
+      card.appendChild(left);
+      card.appendChild(right);
 
       booksList.appendChild(card);
     });
@@ -171,6 +205,144 @@ function setModeUI() {
     }
 
     return response.json();
+  }
+
+  async function fetchStandaloneBooks(token) {
+    const response = await fetch(`${SERIES_API_BASE}/api/books/me/standalone`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to load standalone books"));
+    }
+
+    return response.json();
+  }
+
+  function renderStandaloneBooks(books) {
+    standaloneBooksList.innerHTML = "";
+
+    if (!books || books.length === 0) {
+      standaloneBooksList.innerHTML = `<p class="cb-note">You do not have standalone books available.</p>`;
+      return;
+    }
+
+    books.forEach((book) => {
+      const card = document.createElement("div");
+      card.className = "series-book-card";
+
+      const left = document.createElement("div");
+      left.className = "series-book-left";
+
+      const cover = document.createElement("img");
+      cover.className = "series-book-cover";
+      cover.alt = `${book.title ?? "Book"} cover`;
+      cover.src = book.coverUrl || "svg_files/bookfinder logo.svg";
+
+      const meta = document.createElement("div");
+      meta.className = "series-book-meta";
+
+      const title = document.createElement("p");
+      title.className = "series-book-title";
+      title.textContent = book.title ?? "Untitled Book";
+
+      const sub = document.createElement("p");
+      sub.className = "series-book-sub";
+      sub.textContent = book.publicationStatus || "Draft";
+
+      meta.appendChild(title);
+      meta.appendChild(sub);
+
+      left.appendChild(cover);
+      left.appendChild(meta);
+
+      const right = document.createElement("div");
+      right.className = "series-book-right";
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "series-book-btn series-book-btn-secondary";
+      addBtn.textContent = "Add";
+      addBtn.addEventListener("click", async () => {
+        await handleAddBookToSeries(book.bookId);
+      });
+
+      right.appendChild(addBtn);
+
+      card.appendChild(left);
+      card.appendChild(right);
+
+      standaloneBooksList.appendChild(card);
+    });
+  }
+
+  async function refreshSeriesBooks(token) {
+    currentSeriesData = await fetchSeriesDetails(seriesIdFromUrl, token);
+    renderSeriesBooks(currentSeriesData.booksInSeries ?? []);
+  }
+
+  async function refreshStandaloneBooks(token) {
+    const standaloneBooks = await fetchStandaloneBooks(token);
+    renderStandaloneBooks(standaloneBooks);
+  }
+
+  async function handleAddBookToSeries(bookId) {
+    const token = getTokenOrRedirect();
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `${SERIES_API_BASE}/api/books/${bookId}/assign-series/${seriesIdFromUrl}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(parseErrorText(errorText, "Failed to add book to series"));
+      }
+
+      await refreshSeriesBooks(token);
+      await refreshStandaloneBooks(token);
+    } catch (error) {
+      console.error("Error adding book to series:", error);
+      alert(error.message || "Could not add book to series.");
+    }
+  }
+
+  async function handleRemoveBookFromSeries(bookId) {
+    const token = getTokenOrRedirect();
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `${SERIES_API_BASE}/api/books/${bookId}/remove-series`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(parseErrorText(errorText, "Failed to remove book from series"));
+      }
+
+      await refreshSeriesBooks(token);
+      await refreshStandaloneBooks(token);
+    } catch (error) {
+      console.error("Error removing book from series:", error);
+      alert(error.message || "Could not remove book from series.");
+    }
   }
 
   async function updateSeries(seriesId, payload, token) {
