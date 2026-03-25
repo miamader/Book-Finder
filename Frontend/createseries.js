@@ -430,7 +430,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentSeriesData = await fetchSeriesDetails(seriesIdFromUrl, token);
 
       seriesNameInput.value = currentSeriesData.seriesName ?? "";
-      seriesDescInput.value = currentSeriesData.description ?? "";
+      seriesDescInput.value = currentSeriesData.seriesDescription ?? "";
 
       if (currentSeriesData.coverUrl) {
         showExistingCover(currentSeriesData.coverUrl);
