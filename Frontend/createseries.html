@@ -48,33 +48,54 @@
             </div>
         </section>
 
-        <section class="cb-card" aria-label="Series details form">
-            <div class="cb-card-inner">
-                <h2 class="cb-card-title">Series Details</h2>
-                <div class="cb-divider"></div>
+        <div class="cb-right-col">
 
-                <form class="cb-form" id="seriesForm">
+            <section class="cb-card" aria-label="Series details form">
+                <div class="cb-card-inner">
+                    <h2 id="seriesFormTitle" class="cb-card-title">Create Series</h2>
+                    <div class="cb-divider"></div>
 
-                    <div class="cb-field">
-                        <label class="cb-label" for="seriesName">Series Name</label>
-                        <input id="seriesName" class="cb-input" type="text" placeholder="Untitled Series" />
-                    </div>
+                    <form class="cb-form" id="seriesForm">
 
-                    <div class="cb-field">
-                        <div class="cb-label-row">
-                            <label class="cb-label" for="seriesDesc">Description</label>
-                            <span class="cb-info" title="Tell readers what this series is about">i</span>
+                        <div class="cb-field">
+                            <label class="cb-label" for="seriesName">Series Name</label>
+                            <input id="seriesName" class="cb-input" type="text" placeholder="Untitled Series" />
                         </div>
-                        <textarea id="seriesDesc" class="cb-textarea" placeholder=""></textarea>
-                    </div>
 
-                    <div class="cb-actions">
-                        <button class="cb-next" type="submit">Create Series →</button>
-                    </div>
+                        <div class="cb-field">
+                            <div class="cb-label-row">
+                                <label class="cb-label" for="seriesDesc">Description</label>
+                                <span class="cb-info" title="Tell readers what this series is about">i</span>
+                            </div>
+                            <textarea id="seriesDesc" class="cb-textarea" placeholder=""></textarea>
+                        </div>
 
-                </form>
-            </div>
-        </section>
+                        <div class="cb-actions">
+                            <button id="seriesSubmitBtn" class="cb-next" type="submit">Create Series →</button>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+
+            <section class="cb-card cb-books-card" aria-label="Books in this series">
+                <div class="cb-card-inner">
+                    <h2 class="cb-card-title">Books in This Series</h2>
+                    <div class="cb-divider"></div>
+
+                    <p id="seriesBooksHelper" class="cb-note">Save the series first to manage books.</p>
+
+                    <div id="seriesBooksList" class="series-books-list" hidden></div>
+
+                    <div id="seriesBooksActions" class="cb-actions" hidden>
+                        <button id="addBookToSeriesBtn" class="cb-next cb-next-disabled" type="button" disabled>
+                            Add Book to Series
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
 
     </div>
 </main>
