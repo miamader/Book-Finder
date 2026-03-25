@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookFinder | Manage Books</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="managebooks.css" />
+    <script src="components/navbar.js" defer></script>
+    <script src="managebooks.js" defer></script>
+</head>
+<body>
+<bf-navbar active="mybooks"></bf-navbar>
+
+<main class="mb-main">
+    <div class="mb-wrap">
+        <section class="mb-hero">
+            <div>
+                <h1 class="mb-title">Manage Books</h1>
+                <p class="mb-subtitle">View, filter, publish, and edit all the books you own.</p>
+            </div>
+
+            <a class="mb-create-btn" href="createbook.html">+ New Book</a>
+        </section>
+
+        <section class="mb-stats" id="booksStats">
+            <div class="mb-stat-card">
+                <p class="mb-stat-label">Total</p>
+                <p class="mb-stat-value" id="statTotal">0</p>
+            </div>
+            <div class="mb-stat-card">
+                <p class="mb-stat-label">Drafts</p>
+                <p class="mb-stat-value" id="statDrafts">0</p>
+            </div>
+            <div class="mb-stat-card">
+                <p class="mb-stat-label">Published</p>
+                <p class="mb-stat-value" id="statPublished">0</p>
+            </div>
+            <div class="mb-stat-card">
+                <p class="mb-stat-label">Standalone</p>
+                <p class="mb-stat-value" id="statStandalone">0</p>
+            </div>
+        </section>
+
+        <section class="mb-toolbar-card">
+            <div class="mb-toolbar">
+                <div class="mb-search-wrap">
+                    <input
+                            id="searchInput"
+                            class="mb-search"
+                            type="text"
+                            placeholder="Search by title..."
+                    />
+                </div>
+
+                <select id="statusFilter" class="mb-select">
+                    <option value="ALL">All Statuses</option>
+                    <option value="DRAFT">Draft</option>
+                    <option value="PUBLISHED">Published</option>
+                </select>
+
+                <select id="seriesFilter" class="mb-select">
+                    <option value="ALL">All Series</option>
+                    <option value="STANDALONE">Standalone Only</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="mb-list-card">
+            <div class="mb-list-head">
+                <h2 class="mb-list-title">Your Books</h2>
+                <p class="mb-list-summary" id="booksSummary">Loading books...</p>
+            </div>
+
+            <div id="booksGrid" class="mb-grid"></div>
+
+            <div id="booksEmpty" class="mb-empty" hidden>
+                <p class="mb-empty-title">No books found</p>
+                <p class="mb-empty-text">Try changing your filters, or create your first book.</p>
+                <a class="mb-empty-btn" href="createbook.html">Create Book</a>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>
