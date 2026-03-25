@@ -9,6 +9,7 @@
 }
 
 *{ box-sizing:border-box; }
+
 body{
   margin:0;
   font-family:"Poppins", sans-serif;
@@ -24,7 +25,7 @@ body{
   width:min(980px, 92vw);
   margin:0 auto;
   display:grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns:260px 1fr;
   gap:26px;
   align-items:start;
 }
@@ -89,7 +90,8 @@ body{
   position:absolute;
   right:10px;
   bottom:10px;
-  width:22px;height:22px;
+  width:22px;
+  height:22px;
   border-radius:999px;
   border:1px solid rgba(0,0,0,.12);
   background:#fff;
@@ -117,6 +119,12 @@ body{
   font-weight:700;
 }
 
+.cb-card-subtitle{
+  margin:6px 0 0;
+  font-size:13px;
+  color:var(--muted);
+}
+
 .cb-divider{
   height:4px;
   background:rgba(0,0,0,.15);
@@ -124,9 +132,58 @@ body{
   border-radius:2px;
 }
 
-.cb-form{ display:flex; flex-direction:column; gap:14px; }
+.cb-status-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+  padding:10px 12px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:8px;
+  background:#fafafa;
+}
 
-.cb-field{ display:flex; flex-direction:column; gap:6px; }
+.cb-status-label{
+  font-size:13px;
+  font-weight:600;
+  color:#333;
+}
+
+.cb-status-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  border:1px solid transparent;
+}
+
+.cb-status-draft{
+  background:#fff3cd;
+  color:#8a6d1d;
+  border-color:#f0df9a;
+}
+
+.cb-status-published{
+  background:#e9f7ef;
+  color:#1e7a46;
+  border-color:#b9e3c8;
+}
+
+.cb-form{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.cb-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
 
 .cb-label{
   font-size:13px;
@@ -141,7 +198,8 @@ body{
 }
 
 .cb-info{
-  width:16px;height:16px;
+  width:16px;
+  height:16px;
   border-radius:999px;
   display:inline-grid;
   place-items:center;
@@ -151,7 +209,9 @@ body{
   border:1px solid rgba(0,0,0,.18);
 }
 
-.cb-input, .cb-select, .cb-textarea{
+.cb-input,
+.cb-select,
+.cb-textarea{
   width:100%;
   border:1px solid rgba(0,0,0,.10);
   border-radius:2px;
@@ -162,7 +222,9 @@ body{
   background:#fff;
 }
 
-.cb-input::placeholder{ color:#9a9a9a; }
+.cb-input::placeholder{
+  color:#9a9a9a;
+}
 
 .cb-textarea{
   height:130px;
@@ -171,9 +233,85 @@ body{
 
 .cb-row{
   display:grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns:1fr;
   gap:18px;
   align-items:end;
+}
+
+.cb-series-helper{
+  margin:0 0 4px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.cb-series-picker{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.cb-series-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+
+.cb-series-card{
+  width:100%;
+  border:1px solid rgba(0,0,0,.10);
+  background:#fff;
+  border-radius:10px;
+  padding:10px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.cb-series-card:hover{
+  border-color:rgba(240,84,84,.45);
+  transform:translateY(-1px);
+}
+
+.cb-series-card.is-selected{
+  border-color:var(--red);
+  box-shadow:0 0 0 2px rgba(240,84,84,.10);
+}
+
+.cb-series-card-cover{
+  width:54px;
+  height:72px;
+  object-fit:cover;
+  border-radius:6px;
+  flex-shrink:0;
+  background:#efefef;
+}
+
+.cb-series-card-meta{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+
+.cb-series-card-title{
+  margin:0;
+  font-size:13px;
+  font-weight:700;
+  color:#222;
+  line-height:1.3;
+}
+
+.cb-series-card-sub{
+  margin:0;
+  font-size:11px;
+  color:#666;
+}
+
+.cb-series-card-standalone{
+  justify-content:flex-start;
 }
 
 .cb-tag-entry{
@@ -247,10 +385,21 @@ body{
   border-radius:4px;
   cursor:pointer;
 }
-.cb-next:hover{ filter:brightness(.95); }
+
+.cb-next:hover{
+  filter:brightness(.95);
+}
 
 @media (max-width: 900px){
-  .cb-wrap{ grid-template-columns: 1fr; }
-  .cb-cover-box{ height:260px; }
-  .cb-row{ grid-template-columns: 1fr; }
+  .cb-wrap{
+    grid-template-columns:1fr;
+  }
+
+  .cb-cover-box{
+    height:260px;
+  }
+
+  .cb-series-grid{
+    grid-template-columns:1fr;
+  }
 }

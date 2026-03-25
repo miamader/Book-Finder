@@ -44,8 +44,14 @@
 
     <section class="cb-card" aria-label="Book details form">
       <div class="cb-card-inner">
-        <h2 class="cb-card-title">Book Details</h2>
+        <h2 id="bookFormTitle" class="cb-card-title">Book Details</h2>
+        <p id="bookFormSubtitle" class="cb-card-subtitle">Create a new book draft and organize it however you want.</p>
         <div class="cb-divider"></div>
+
+        <div id="bookStatusRow" class="cb-status-row" hidden>
+          <span class="cb-status-label">Current Status</span>
+          <span id="bookStatusBadge" class="cb-status-badge">DRAFT</span>
+        </div>
 
         <form class="cb-form" id="bookForm">
           <div class="cb-field">
@@ -71,15 +77,22 @@
                 <option value="" selected disabled>Select a category</option>
               </select>
             </div>
+          </div>
 
-            <div class="cb-field">
-              <div class="cb-label-row">
-                <label class="cb-label" for="series">Series</label>
-                <span class="cb-info" title="Optional">i</span>
-              </div>
-              <select id="series" class="cb-select">
-                <option value="">Standalone book</option>
-              </select>
+          <div class="cb-field">
+            <div class="cb-label-row">
+              <label class="cb-label" for="series">Series</label>
+              <span class="cb-info" title="Optional">i</span>
+            </div>
+
+            <p class="cb-series-helper">Choose standalone or select one of your series below.</p>
+
+            <select id="series" class="cb-select" hidden>
+              <option value="">Standalone book</option>
+            </select>
+
+            <div id="seriesPicker" class="cb-series-picker">
+              <div id="seriesCardList" class="cb-series-grid"></div>
             </div>
           </div>
 
@@ -97,10 +110,10 @@
             <div id="tagList" class="cb-chip-list" aria-live="polite"></div>
           </div>
 
-          <p class="cb-note">Books are created as drafts first. You can publish them after creation.</p>
+          <p id="bookFormNote" class="cb-note">Books are created as drafts first. You can publish them after creation.</p>
 
           <div class="cb-actions">
-            <button class="cb-next" type="submit">Create Book →</button>
+            <button id="bookSubmitBtn" class="cb-next" type="submit">Create Book →</button>
           </div>
         </form>
       </div>
