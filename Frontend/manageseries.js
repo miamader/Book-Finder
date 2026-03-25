@@ -55,6 +55,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     return data.content ?? [];
   }
 
+  async function deleteSeries(series) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${series.seriesName ?? "this series"}"?\n\nWARNING: This will also delete all books inside this series.\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    const response = await fetch(`${MANAGE_SERIES_API_BASE}/api/series/${series.seriesId}/delete`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to delete series"));
+    }
+  }
+
   function updateStats(seriesList) {
     const totalBooks = seriesList.reduce((sum, series) => sum + (series.totalBooks ?? 0), 0);
     const emptySeries = seriesList.filter((series) => (series.totalBooks ?? 0) === 0).length;
@@ -168,16 +188,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       editLink.href = `createseries.html?seriesId=${series.seriesId}`;
       editLink.textContent = "Edit";
 
-      const viewBooksBtn = document.createElement("button");
-      viewBooksBtn.type = "button";
-      viewBooksBtn.className = "ms-btn ms-btn-secondary";
-      viewBooksBtn.textContent = "Manage";
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "ms-btn ms-btn-danger";
+      deleteBtn.textContent = "Delete";
 
-      viewBooksBtn.addEventListener("click", () => {
-        window.location.href = `createseries.html?seriesId=${series.seriesId}`;
+      deleteBtn.addEventListener("click", async () => {
+        try {
+          deleteBtn.disabled = true;
+          await deleteSeries(series);
+          await loadSeries();
+        } catch (error) {
+          console.error("Could not delete series:", error);
+          alert(error.message || "Could not delete the series.");
+        } finally {
+          deleteBtn.disabled = false;
+        }
       });
 
       actions.appendChild(editLink);
+      actions.appendChild(deleteBtn);
 
       body.appendChild(name);
       body.appendChild(description);

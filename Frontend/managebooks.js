@@ -74,6 +74,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  async function deleteBook(book) {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${book.title ?? "this book"}"?\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    const response = await fetch(`${MANAGE_BOOKS_API_BASE}/api/books/${book.bookId}/delete`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to delete book"));
+    }
+  }
+
   function updateStats(books) {
     const draftCount = books.filter((book) => book.publicationStatus === "DRAFT").length;
     const publishedCount = books.filter((book) => book.publicationStatus === "PUBLISHED").length;
@@ -117,7 +137,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return [...allBooks]
       .filter((book) => {
         if (!searchValue) return true;
-
         return (book.title ?? "").toLowerCase().includes(searchValue);
       })
       .filter((book) => {
@@ -142,7 +161,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const filteredBooks = getFilteredBooks();
 
     booksGrid.innerHTML = "";
-
     booksSummary.textContent = `Showing ${filteredBooks.length} of ${allBooks.length} books.`;
 
     if (filteredBooks.length === 0) {
@@ -236,8 +254,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
 
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "mb-btn mb-btn-danger";
+      deleteBtn.textContent = "Delete";
+
+      deleteBtn.addEventListener("click", async () => {
+        try {
+          deleteBtn.disabled = true;
+          await deleteBook(book);
+          await loadBooks();
+        } catch (error) {
+          console.error("Could not delete book:", error);
+          alert(error.message || "Could not delete the book.");
+        } finally {
+          deleteBtn.disabled = false;
+        }
+      });
+
       actions.appendChild(editLink);
       actions.appendChild(publishBtn);
+      actions.appendChild(deleteBtn);
 
       body.appendChild(top);
       body.appendChild(meta);

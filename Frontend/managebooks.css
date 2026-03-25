@@ -336,3 +336,9 @@ body{
     align-items:flex-start;
   }
 }
+
+.mb-btn-danger{
+  background:#fff1f1;
+  color:#b42318;
+  border:1px solid #f3b3b3;
+}
