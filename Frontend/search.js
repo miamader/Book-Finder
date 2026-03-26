@@ -317,7 +317,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? `Results for “${activeKeyword}”`
       : "Browse published books";
 
-    resultsMeta.textContent = `Showing ${books.length} of ${state.totalElements} books.`;
+    if (state.totalElements === 0) {
+      resultsMeta.textContent = "No published books matched your filters.";
+    } else {
+      resultsMeta.textContent = `Showing ${books.length} of ${state.totalElements} books.`;
+    }
 
     if (books.length === 0) {
       resultsEmpty.hidden = false;

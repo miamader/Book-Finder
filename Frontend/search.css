@@ -469,3 +469,9 @@
     width: 100%;
   }
 }
+
+.sr-loading[hidden],
+.sr-empty[hidden],
+.sr-results-grid[hidden] {
+  display: none !important;
+}
