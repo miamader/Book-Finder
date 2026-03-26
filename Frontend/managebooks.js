@@ -272,7 +272,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
 
+      const writeLink = document.createElement("a");
+      writeLink.className = "mb-btn mb-btn-secondary";
+      writeLink.href = `writebook.html?bookId=${book.bookId}`;
+      writeLink.textContent = "Write";
+
       actions.appendChild(editLink);
+      actions.appendChild(writeLink);
       actions.appendChild(publishBtn);
       actions.appendChild(deleteBtn);
 
