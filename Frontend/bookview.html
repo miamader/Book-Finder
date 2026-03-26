@@ -1,136 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book Finder | Book View</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- styles -->
     <link rel="stylesheet" href="styles/global.css" />
     <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="bookview.css" />
 
-    <link rel="stylesheet" href="bookview.css"/>
-    <!-- components -->
     <script src="components/navbar.js" defer></script>
+    <script src="bookview.js" defer></script>
 </head>
-
 <body>
- <bf-navbar active="browse"></bf-navbar>
+<bf-navbar active="browse"></bf-navbar>
 
-    <div class="page-container">
+<main class="bv-main">
+    <div class="bv-wrap">
+        <section id="pageLoading" class="bv-state">
+            <div class="bv-spinner" aria-hidden="true"></div>
+            <p>Loading book details...</p>
+        </section>
 
-    <h1 class="book-title" id="bookTitle">Book Title</h1>
+        <section id="pageError" class="bv-state bv-state-error" hidden>
+            <h1>Could not load this book</h1>
+            <p id="pageErrorText">Please try again.</p>
+        </section>
 
-    <!-- hero: book cover + info box-->
-    <div class="book-hero">
+        <article id="bookPage" hidden>
+            <header class="bv-header">
+                <div class="bv-header-copy">
+                    <p id="bookEyebrow" class="bv-eyebrow">Book Details</p>
+                    <h1 id="bookTitle" class="bv-title">Book Title</h1>
+                    <p id="bookSubtitle" class="bv-subtitle">Loading book information...</p>
+                </div>
 
-      <!-- left: cover -->
-       <!-- note: hardcoded cover img just for show, remove later-->
-      <div class="book-cover-wrap">
-        <img class="book-cover-img" id="bookCoverImg" src="https://upload.wikimedia.org/wikipedia/en/d/de/Dune-Frank_Herbert_%281965%29_First_edition.jpg" alt="Book Cover"/>
-      </div>
+                <div class="bv-header-side">
+                    <span id="publicationBadge" class="bv-badge">Published</span>
+                </div>
+            </header>
 
-      <!-- right: info box -->
-      <div class="book-info-box">
+            <section class="bv-hero">
+                <div class="bv-cover-panel">
+                    <div id="bookCoverFrame" class="bv-cover-frame">
+                        <img id="bookCoverImg" class="bv-cover-img" alt="Book cover" hidden />
+                        <div id="bookCoverFallback" class="bv-cover-fallback">B</div>
+                    </div>
+                </div>
 
-       
-        <div class="info-rating">
-          <div class="stars" id="infoStars"></div>
-          <span class="rating-score" id="infoRatingScore">0.0</span>
-          <span class="rating-count" id="infoRatingCount">0 ratings</span>
-        </div>
+                <div class="bv-info-panel">
+                    <div class="bv-info-grid">
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Author</span>
+                            <span id="authorName" class="bv-info-value">—</span>
+                        </div>
 
-        
-        <div class="info-stats">
-          <span class="stat">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <span id="statReads">0</span> reads
-          </span>
-          <span class="stat-divider">·</span>
-          <span class="stat">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            <span id="statParts">0</span> parts
-          </span>
-          <span class="stat-divider">·</span>
-          <span class="stat">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span id="statReadTime">0h 0m</span> reading time
-          </span>
-        </div>
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Published</span>
+                            <span id="publishDate" class="bv-info-value">—</span>
+                        </div>
 
-       
-        <button class="btn-primary" id="btnStartReading" onclick="startReading()">
-          Start Reading Now &rsaquo;
-        </button>
-        <button class="btn-secondary" id="btnTableOfContents" onclick="goToTableOfContents()">
-          Go to Table of Contents &rsaquo;
-        </button>
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Series</span>
+                            <span id="seriesName" class="bv-info-value">Standalone</span>
+                        </div>
 
-       
-        <div class="genre-label">Popular Genre's Associated with this book:</div>
-        <div class="genre-tags" id="genreTags"></div>
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Volume</span>
+                            <span id="volumeNumber" class="bv-info-value">—</span>
+                        </div>
 
-      </div>
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Chapters</span>
+                            <span id="chapterCount" class="bv-info-value">0</span>
+                        </div>
+
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Reviews</span>
+                            <span id="reviewCountInline" class="bv-info-value">0</span>
+                        </div>
+                    </div>
+
+                    <div class="bv-actions">
+                        <button id="startReadingBtn" class="bv-btn bv-btn-primary" type="button">
+                            Start Reading
+                        </button>
+                        <button id="previewBtn" class="bv-btn bv-btn-secondary" type="button" hidden>
+                            Read Preview
+                        </button>
+                        <button id="tocBtn" class="bv-btn bv-btn-secondary" type="button">
+                            Go to Table of Contents
+                        </button>
+                    </div>
+
+                    <div id="bookNotice" class="bv-notice" hidden></div>
+
+                    <div class="bv-chip-block">
+                        <p class="bv-chip-title">Genres</p>
+                        <div id="genreTags" class="bv-chip-list"></div>
+                    </div>
+
+                    <div class="bv-chip-block">
+                        <p class="bv-chip-title">Hashtags</p>
+                        <div id="hashtagTags" class="bv-chip-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bv-section">
+                <h2 class="bv-section-title">Description</h2>
+                <p id="bookDescription" class="bv-description">—</p>
+            </section>
+
+            <section id="chaptersSection" class="bv-section">
+                <div class="bv-section-head">
+                    <div>
+                        <h2 class="bv-section-title">Table of Contents</h2>
+                        <p id="chaptersMeta" class="bv-section-subtitle">Loading chapters...</p>
+                    </div>
+                </div>
+
+                <div id="chaptersEmpty" class="bv-empty" hidden>
+                    No chapters are available yet.
+                </div>
+
+                <div id="chaptersList" class="bv-chapter-list"></div>
+            </section>
+
+            <section class="bv-section">
+                <div class="bv-section-head">
+                    <div>
+                        <h2 class="bv-section-title">Reviews</h2>
+                        <p id="reviewsMeta" class="bv-section-subtitle">Loading reviews...</p>
+                    </div>
+
+                    <div class="bv-rating-summary">
+                        <div id="ratingStars" class="bv-stars" aria-label="Average rating"></div>
+                        <span id="ratingAverage" class="bv-rating-average">0.0</span>
+                        <span id="ratingCount" class="bv-rating-count">0 reviews</span>
+                    </div>
+                </div>
+
+                <div id="reviewsEmpty" class="bv-empty" hidden>
+                    No reviews yet.
+                </div>
+
+                <div id="reviewsGrid" class="bv-review-grid"></div>
+
+                <button id="loadMoreReviewsBtn" class="bv-btn bv-btn-outline" type="button" hidden>
+                    Show more reviews
+                </button>
+            </section>
+        </article>
     </div>
-
-    <!-- author section -->
-    <div class="author-row">
-      <div class="author-avatar" id="authorAvatar">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-      </div>
-      <div class="author-meta">
-        <span class="author-label">Written By</span>
-        <span class="author-name" id="authorName">—</span>
-      </div>
-      <div class="year-meta">
-        <span class="author-label">Year</span>
-        <span class="author-name" id="bookYear">—</span>
-      </div>
-    </div>
-
-    <!-- status -->
-    <div class="status-tags" id="statusTags"></div>
-
-    <!-- description -->
-    <div class="section-block">
-      <h2 class="section-title">Description</h2>
-      <p class="description-text" id="bookDescription">—</p>
-    </div>
-
-    <hr class="section-divider"/>
-
-    <!-- book review section -->
-    <div class="section-block">
-      <h2 class="section-title">Book Reviews</h2>
-
-      <div class="overall-rating">
-        <div class="stars large" id="overallStars"></div>
-        <span class="overall-score" id="overallScore">0.0</span>
-        <span class="overall-count" id="overallCount">0 reviews</span>
-      </div>
-
-      <div class="reviews-grid" id="reviewsGrid"></div>
-
-      <button class="btn-show-more" id="btnShowMore" onclick="loadMoreReviews()">
-        Show more
-      </button>
-    </div>
-
-    <hr class="section-divider"/>
-
-    <!-- 'books like this' -->
-    <div class="section-block">
-      <h2 class="section-title">Books Like This</h2>
-      <div class="recs-carousel-wrapper">
-        <div class="recs-track" id="recsTrack"></div>
-      </div>
-    </div>
-
-  </div>
-
-    <script src="bookview.js"></script>
+</main>
 </body>
 </html>
