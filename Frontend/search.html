@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookFinder | Browse</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="search.css" />
+    <script src="components/navbar.js" defer></script>
+    <script src="search.js" defer></script>
+</head>
+<body>
+<bf-navbar active="browse"></bf-navbar>
+
+<main class="sr-main">
+    <div class="sr-wrap">
+        <section class="sr-hero">
+            <div>
+                <p class="sr-eyebrow">Discover</p>
+                <h1 class="sr-title">Browse Books</h1>
+                <p class="sr-subtitle">
+                    Search published books by title, genre, series, author, and hashtags.
+                </p>
+            </div>
+        </section>
+
+        <section class="sr-layout">
+            <aside id="browseFilters" class="sr-filters-card" aria-label="Browse filters">
+                <div class="sr-card-head">
+                    <h2 class="sr-card-title">Filters</h2>
+                    <p class="sr-card-subtitle">Use one or many filters to narrow your results.</p>
+                </div>
+
+                <form id="searchForm" class="sr-form">
+                    <div class="sr-field">
+                        <label class="sr-label" for="keywordInput">Keyword</label>
+                        <input
+                                id="keywordInput"
+                                class="sr-input"
+                                type="text"
+                                placeholder="Search by title or summary"
+                        />
+                    </div>
+
+                    <div class="sr-field">
+                        <label class="sr-label" for="authorInput">Author</label>
+                        <input
+                                id="authorInput"
+                                class="sr-input"
+                                type="text"
+                                placeholder="Search by username"
+                        />
+                    </div>
+
+                    <div class="sr-field">
+                        <label class="sr-label" for="seriesSelect">Series</label>
+                        <select id="seriesSelect" class="sr-select">
+                            <option value="">All Series</option>
+                        </select>
+                    </div>
+
+                    <div class="sr-field">
+                        <div class="sr-label-row">
+                            <label class="sr-label" for="hashtagInput">Hashtags</label>
+                            <span class="sr-field-note">Press Enter or comma to add one.</span>
+                        </div>
+
+                        <div class="sr-hashtag-entry">
+                            <input
+                                    id="hashtagInput"
+                                    class="sr-input"
+                                    type="text"
+                                    placeholder="Add a hashtag"
+                                    maxlength="40"
+                            />
+                            <button id="addHashtagBtn" class="sr-add-btn" type="button">Add</button>
+                        </div>
+
+                        <div id="hashtagList" class="sr-chip-list" aria-live="polite"></div>
+                    </div>
+
+                    <div class="sr-field">
+                        <div class="sr-label-row">
+                            <span class="sr-label">Genres</span>
+                            <span class="sr-field-note">Choose any that apply.</span>
+                        </div>
+                        <div id="genreOptions" class="sr-check-list"></div>
+                    </div>
+
+                    <div class="sr-actions">
+                        <button id="applyFiltersBtn" class="sr-btn sr-btn-primary" type="submit">
+                            Apply Filters
+                        </button>
+                        <button id="clearFiltersBtn" class="sr-btn sr-btn-secondary" type="button">
+                            Clear All
+                        </button>
+                    </div>
+                </form>
+            </aside>
+
+            <section class="sr-results-card" aria-label="Browse results">
+                <div class="sr-results-head">
+                    <div>
+                        <h2 id="resultsSummary" class="sr-card-title">Browse published books</h2>
+                        <p id="resultsMeta" class="sr-card-subtitle">Loading books...</p>
+                    </div>
+                </div>
+
+                <div id="loadingState" class="sr-loading">
+                    <div class="sr-spinner" aria-hidden="true"></div>
+                    <p>Loading books...</p>
+                </div>
+
+                <div id="resultsGrid" class="sr-results-grid"></div>
+
+                <div id="resultsEmpty" class="sr-empty" hidden>
+                    <p class="sr-empty-title">No books found</p>
+                    <p class="sr-empty-text">Try changing your filters or removing some of them.</p>
+                </div>
+
+                <div class="sr-pagination">
+                    <button id="prevPageBtn" class="sr-page-btn" type="button">← Previous</button>
+                    <span id="pageIndicator" class="sr-page-indicator">Page 0 of 0</span>
+                    <button id="nextPageBtn" class="sr-page-btn" type="button">Next →</button>
+                </div>
+            </section>
+        </section>
+    </div>
+</main>
+</body>
+</html>

@@ -79,6 +79,7 @@ class BookFinderNav extends HTMLElement {
     this.highlightActive();
     this.setupDropdown();
     this.setupWriteDropdown();
+    this.setupSearchNavigation();
     this.loadCurrentUser();
   }
 
@@ -139,6 +140,62 @@ class BookFinderNav extends HTMLElement {
       menu.hidden = true;
       toggle.setAttribute("aria-expanded", "false");
     });
+  }
+
+  setupSearchNavigation() {
+    const searchInput = this.querySelector(".nav-search-input");
+    const filterBtn = this.querySelector(".nav-filter");
+
+    if (!searchInput) return;
+
+    const buildBrowseUrl = () => {
+      const query = searchInput.value.trim();
+      return query ? `search.html?q=${encodeURIComponent(query)}` : "search.html";
+    };
+
+    const goToBrowse = () => {
+      window.location.href = buildBrowseUrl();
+    };
+
+    const syncFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      searchInput.value = params.get("q") ?? "";
+    };
+
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        goToBrowse();
+      }
+    });
+
+    filterBtn?.addEventListener("click", () => {
+      const currentPage = window.location.pathname.split("/").pop() || "";
+
+      if (currentPage === "search.html") {
+        const filtersCard = document.getElementById("browseFilters");
+        const keywordInput = document.getElementById("keywordInput");
+
+        if (filtersCard) {
+          filtersCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        if (keywordInput) {
+          keywordInput.focus();
+        }
+
+        return;
+      }
+
+      goToBrowse();
+    });
+
+    document.addEventListener("browse:sync-keyword", (event) => {
+      const nextKeyword = event.detail?.keyword ?? "";
+      searchInput.value = nextKeyword;
+    });
+
+    syncFromUrl();
   }
 
   async loadCurrentUser() {
