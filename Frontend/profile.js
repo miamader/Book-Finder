@@ -1,4 +1,4 @@
-const API_BASE = "https://book-finder-production-5c8b.up.railway.app";
+const PROFILE_API_BASE = "https://book-finder-production-5c8b.up.railway.app";
 
 const state = {
   token: localStorage.getItem("token"),
@@ -248,7 +248,7 @@ async function fetchJson(path, options = {}) {
   const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const response = await fetch(`${API_BASE}${path}`, {
+    const response = await fetch(`${PROFILE_API_BASE}${path}`, {
       ...options,
       signal: controller.signal
     });
