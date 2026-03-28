@@ -412,7 +412,7 @@ function renderChapters(pageData) {
         return;
       }
 
-      await openChapter(chapter);
+      openChapter(chapter);
     });
 
     card.appendChild(main);
@@ -501,49 +501,13 @@ function renderReviews(pageData, append) {
   refs.loadMoreReviewsBtn.hidden = state.reviewsPage >= state.reviewsTotalPages - 1;
 }
 
-async function getReadableChapterUrl(chapter) {
-  const token = getToken();
+function openChapter(chapter) {
+  const params = new URLSearchParams({
+    bookId: String(state.bookId),
+    chapterId: String(chapter.chapterId)
+  });
 
-  if (token) {
-    const fullChapter = await fetchJsonOrNull(`/api/chapters/${chapter.chapterId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (fullChapter?.fullUrl) {
-      return fullChapter.fullUrl;
-    }
-  }
-
-  const isPreview = chapter.preview === true || chapter.isPreview === true;
-
-  if (isPreview) {
-    const previewChapter = await fetchJsonOrNull(`/api/chapters/${chapter.chapterId}/preview`);
-    if (previewChapter?.previewUrl) {
-      return previewChapter.previewUrl;
-    }
-  }
-
-  return null;
-}
-
-async function openChapter(chapter) {
-  const url = await getReadableChapterUrl(chapter);
-
-  if (!url) {
-    alert("Could not open this chapter.");
-    return;
-  }
-
-  const res = await fetch(url);
-  const rawContent = await res.text();
-
-  localStorage.setItem("activeChapterTitle", chapter.title || "");
-  localStorage.setItem("activeChapterContent", rawContent);
-  localStorage.setItem("activeChapterType", chapter.fileType || "HTML");
-
-  window.location.href = "chapter-reader.html";
+  window.location.href = `chapter-reader.html?${params.toString()}`;
 }
 
 async function handleOpenPreview() {
@@ -556,7 +520,7 @@ async function handleOpenPreview() {
     return;
   }
 
-  await openChapter(previewChapter);
+  openChapter(previewChapter);
 }
 
 async function handleStartReading() {
@@ -600,5 +564,5 @@ async function handleStartReading() {
     }
   }
 
-  await openChapter(targetChapter);
+  openChapter(targetChapter);
 }

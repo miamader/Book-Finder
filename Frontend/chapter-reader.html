@@ -3,37 +3,67 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Chapter Reader</title>
+    <title>Book Finder | Chapter Reader</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="chapter-reader.css" />
     <script src="chapter-reader.js" defer></script>
 </head>
-
 <body>
-
 <main class="reader-shell">
-
-    <div class="reader-topbar">
-        <button id="backBtn" class="reader-btn">← Back</button>
-
-        <div class="reader-title">
-            <h2 id="chapterTitle">Loading...</h2>
+    <header class="reader-topbar">
+        <div class="reader-topbar-left">
+            <button id="backBtn" class="reader-btn">← Back to Book</button>
         </div>
 
-        <div class="reader-controls">
-            <button id="prevBtn" class="reader-btn">Prev</button>
-            <button id="nextBtn" class="reader-btn">Next</button>
+        <div class="reader-heading">
+            <p id="readerBookTitle" class="reader-book-title">Loading book...</p>
+            <h1 id="chapterTitle">Loading chapter...</h1>
         </div>
-    </div>
 
-    <div class="reader-spread">
-        <section id="leftPage" class="reader-page"></section>
-        <div class="reader-divider"></div>
-        <section id="rightPage" class="reader-page"></section>
-    </div>
+        <div class="reader-topbar-right">
+            <span id="readerStatus" class="reader-status">Loading...</span>
+        </div>
+    </header>
 
+    <section class="reader-toolbar">
+        <div class="reader-chapter-controls">
+            <button id="prevChapterBtn" class="reader-btn" type="button">Previous Chapter</button>
+
+            <label class="reader-select-wrap" for="chapterSelect">
+                <span class="reader-select-label">Chapter</span>
+                <select id="chapterSelect" class="reader-select"></select>
+            </label>
+
+            <button id="nextChapterBtn" class="reader-btn" type="button">Next Chapter</button>
+        </div>
+
+        <div class="reader-page-controls">
+            <button id="prevPageBtn" class="reader-btn" type="button">Previous Pages</button>
+            <span id="pageIndicator" class="reader-page-indicator">Pages 1-2</span>
+            <button id="nextPageBtn" class="reader-btn" type="button">Next Pages</button>
+        </div>
+    </section>
+
+    <section id="readerNotice" class="reader-notice" hidden></section>
+
+    <section id="readerLoading" class="reader-state">
+        <div class="reader-spinner" aria-hidden="true"></div>
+        <p>Loading chapter...</p>
+    </section>
+
+    <section id="readerError" class="reader-state reader-state-error" hidden>
+        <h2>Could not open this chapter</h2>
+        <p id="readerErrorText">Please try again.</p>
+    </section>
+
+    <section id="readerContent" class="reader-content" hidden>
+        <div class="reader-spread">
+            <article id="leftPage" class="reader-page"></article>
+            <div class="reader-divider"></div>
+            <article id="rightPage" class="reader-page"></article>
+        </div>
+    </section>
 </main>
-
 </body>
 </html>
