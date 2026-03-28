@@ -533,7 +533,23 @@ async function openChapter(chapter) {
     return;
   }
 
-  window.location.href = url;
+  async function openChapter(chapter) {
+    const url = await getReadableChapterUrl(chapter);
+
+    if (!url) {
+      alert("Could not open this chapter.");
+      return;
+    }
+
+    const res = await fetch(url);
+    const rawContent = await res.text();
+
+    localStorage.setItem("activeChapterTitle", chapter.title || "");
+    localStorage.setItem("activeChapterContent", rawContent);
+    localStorage.setItem("activeChapterType", chapter.fileType);
+
+    window.location.href = "chapter-reader.html";
+  }
 }
 
 async function handleOpenPreview() {
