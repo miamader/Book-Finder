@@ -10,21 +10,23 @@ const state = {
 
 const refs = {};
 
-document.addEventListener("DOMContentLoaded", async () => {
-  cacheRefs();
-  bindEvents();
-
+function initProfilePage() {
   try {
-    setLoading(true);
-    await loadProfilePage();
-    refs.profileContent.hidden = false;
+    cacheRefs();
+    validateRefs();
+    bindEvents();
+    loadProfile();
   } catch (error) {
-    console.error("Could not load profile:", error);
-    showError(error.message || "Could not load the profile.");
-  } finally {
-    setLoading(false);
+    console.error("Profile init error:", error);
+    safeShowError(error.message || "Profile page failed to initialize.");
   }
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initProfilePage);
+} else {
+  initProfilePage();
+}
 
 function cacheRefs() {
   refs.profileLoading = document.getElementById("profileLoading");
@@ -55,6 +57,42 @@ function cacheRefs() {
   refs.booksMeta = document.getElementById("booksMeta");
   refs.booksEmpty = document.getElementById("booksEmpty");
   refs.booksGrid = document.getElementById("booksGrid");
+}
+
+function validateRefs() {
+  const requiredIds = [
+    "profileLoading",
+    "profileError",
+    "profileErrorText",
+    "profileContent",
+    "profileAvatar",
+    "profileEyebrow",
+    "profileUsername",
+    "profileFullname",
+    "profileJoined",
+    "profileEmailCard",
+    "profileEmail",
+    "profileBookCount",
+    "profileNotice",
+    "profileBio",
+    "editProfileBtn",
+    "editSection",
+    "profileForm",
+    "firstNameInput",
+    "lastNameInput",
+    "bioInput",
+    "saveProfileBtn",
+    "cancelEditBtn",
+    "booksMeta",
+    "booksEmpty",
+    "booksGrid"
+  ];
+
+  requiredIds.forEach((id) => {
+    if (!refs[id]) {
+      throw new Error(`Missing required element in profile.html: ${id}`);
+    }
+  });
 }
 
 function bindEvents() {
@@ -106,15 +144,69 @@ function bindEvents() {
   });
 }
 
+async function loadProfile() {
+  try {
+    setLoading(true);
+
+    const params = new URLSearchParams(window.location.search);
+    const usernameParam = params.get("username")?.trim() || null;
+
+    let myProfile = null;
+
+    if (state.token) {
+      myProfile = await fetchJsonOrNull("/api/users/me", {
+        headers: {
+          Authorization: `Bearer ${state.token}`
+        }
+      });
+    }
+
+    if (!usernameParam) {
+      if (!myProfile) {
+        throw new Error("You need to log in to view your profile.");
+      }
+
+      state.profile = myProfile;
+      state.isOwnProfile = true;
+      state.viewedUsername = myProfile.username;
+      renderProfile();
+      refs.profileContent.hidden = false;
+      return;
+    }
+
+    if (myProfile && myProfile.username.toLowerCase() === usernameParam.toLowerCase()) {
+      state.profile = myProfile;
+      state.isOwnProfile = true;
+      state.viewedUsername = myProfile.username;
+      renderProfile();
+      refs.profileContent.hidden = false;
+      return;
+    }
+
+    const publicProfile = await fetchJson(`/api/users/profile/${encodeURIComponent(usernameParam)}`);
+
+    state.profile = publicProfile;
+    state.isOwnProfile = false;
+    state.viewedUsername = publicProfile.username;
+    renderProfile();
+    refs.profileContent.hidden = false;
+  } catch (error) {
+    console.error("Could not load profile:", error);
+    safeShowError(error.message || "Could not load the profile.");
+  } finally {
+    setLoading(false);
+  }
+}
+
 function setLoading(isLoading) {
   refs.profileLoading.hidden = !isLoading;
 }
 
-function showError(message) {
-  refs.profileLoading.hidden = true;
-  refs.profileContent.hidden = true;
-  refs.profileError.hidden = false;
-  refs.profileErrorText.textContent = message;
+function safeShowError(message) {
+  if (refs.profileLoading) refs.profileLoading.hidden = true;
+  if (refs.profileContent) refs.profileContent.hidden = true;
+  if (refs.profileError) refs.profileError.hidden = false;
+  if (refs.profileErrorText) refs.profileErrorText.textContent = message;
 }
 
 function setNotice(message = "") {
@@ -152,68 +244,38 @@ function buildFullName(profile) {
 }
 
 async function fetchJson(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, options);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText && errorText.trim() ? errorText : `Request failed (${response.status})`);
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText && errorText.trim() ? errorText : `Request failed (${response.status})`);
+    }
+
+    if (response.status === 204) return null;
+    return response.json();
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("Request timed out while loading the profile.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  if (response.status === 204) return null;
-  return response.json();
 }
 
 async function fetchJsonOrNull(path, options = {}) {
   try {
-    const response = await fetch(`${API_BASE}${path}`, options);
-    if (!response.ok) return null;
-    if (response.status === 204) return null;
-    return response.json();
+    return await fetchJson(path, options);
   } catch (error) {
     return null;
   }
-}
-
-async function loadProfilePage() {
-  const params = new URLSearchParams(window.location.search);
-  const usernameParam = params.get("username")?.trim() || null;
-
-  let myProfile = null;
-
-  if (state.token) {
-    myProfile = await fetchJsonOrNull("/api/users/me", {
-      headers: {
-        Authorization: `Bearer ${state.token}`
-      }
-    });
-  }
-
-  if (!usernameParam) {
-    if (!myProfile) {
-      throw new Error("You need to log in to view your profile.");
-    }
-
-    state.profile = myProfile;
-    state.isOwnProfile = true;
-    state.viewedUsername = myProfile.username;
-    renderProfile();
-    return;
-  }
-
-  if (myProfile && myProfile.username.toLowerCase() === usernameParam.toLowerCase()) {
-    state.profile = myProfile;
-    state.isOwnProfile = true;
-    state.viewedUsername = myProfile.username;
-    renderProfile();
-    return;
-  }
-
-  const publicProfile = await fetchJson(`/api/users/profile/${encodeURIComponent(usernameParam)}`);
-
-  state.profile = publicProfile;
-  state.isOwnProfile = false;
-  state.viewedUsername = publicProfile.username;
-  renderProfile();
 }
 
 function renderProfile() {
