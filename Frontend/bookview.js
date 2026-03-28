@@ -257,7 +257,13 @@ function renderBookDetails(book) {
     book.publicationStatus === "PUBLISHED" ? "is-published" : "is-draft"
   );
 
-  refs.authorName.textContent = book.authorUsername || "—";
+  if (book.authorUsername) {
+    refs.authorName.textContent = book.authorUsername;
+    refs.authorName.href = `profile.html?username=${encodeURIComponent(book.authorUsername)}`;
+  } else {
+    refs.authorName.textContent = "—";
+    refs.authorName.removeAttribute("href");
+  }
   refs.publishDate.textContent = formatDate(book.publishDate);
   refs.seriesName.textContent = book.seriesName || "Standalone";
   refs.volumeNumber.textContent =

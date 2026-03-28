@@ -151,20 +151,16 @@ async function loadProfile() {
     const params = new URLSearchParams(window.location.search);
     const usernameParam = params.get("username")?.trim() || null;
 
-    let myProfile = null;
+    if (!usernameParam) {
+      if (!state.token) {
+        throw new Error("You need to log in to view your profile.");
+      }
 
-    if (state.token) {
-      myProfile = await fetchJsonOrNull("/api/users/me", {
+      const myProfile = await fetchJson("/api/users/me", {
         headers: {
           Authorization: `Bearer ${state.token}`
         }
       });
-    }
-
-    if (!usernameParam) {
-      if (!myProfile) {
-        throw new Error("You need to log in to view your profile.");
-      }
 
       state.profile = myProfile;
       state.isOwnProfile = true;
@@ -174,22 +170,17 @@ async function loadProfile() {
       return;
     }
 
-    if (myProfile && myProfile.username.toLowerCase() === usernameParam.toLowerCase()) {
-      state.profile = myProfile;
-      state.isOwnProfile = true;
-      state.viewedUsername = myProfile.username;
-      renderProfile();
-      refs.profileContent.hidden = false;
-      return;
-    }
-
-    const publicProfile = await fetchJson(`/api/users/profile/${encodeURIComponent(usernameParam)}`);
+    // If username is present in the URL, always treat it as a public read-only profile
+    const publicProfile = await fetchJson(
+      `/api/users/profile/${encodeURIComponent(usernameParam)}`
+    );
 
     state.profile = publicProfile;
     state.isOwnProfile = false;
     state.viewedUsername = publicProfile.username;
     renderProfile();
     refs.profileContent.hidden = false;
+
   } catch (error) {
     console.error("Could not load profile:", error);
     safeShowError(error.message || "Could not load the profile.");

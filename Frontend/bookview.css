@@ -490,3 +490,12 @@
     border-radius: 18px;
   }
 }
+
+.bv-info-link {
+  color: var(--red);
+  text-decoration: none;
+}
+
+.bv-info-link:hover {
+  text-decoration: underline;
+}

@@ -228,81 +228,87 @@ document.addEventListener("DOMContentLoaded", async () => {
     return placeholder;
   }
 
-  function createBookCard(book) {
-    const card = document.createElement("article");
-    card.className = "sr-card";
+function createBookCard(book) {
+  const card = document.createElement("article");
+  card.className = "sr-card";
 
-    const coverLink = document.createElement("a");
-    coverLink.className = "sr-card-cover-link";
-    coverLink.href = `bookview.html?id=${book.bookId}`;
-    coverLink.setAttribute("aria-label", `Open ${book.title ?? "book"}`);
+  const coverLink = document.createElement("a");
+  coverLink.className = "sr-card-cover-link";
+  coverLink.href = `bookview.html?id=${book.bookId}`;
+  coverLink.setAttribute("aria-label", `Open ${book.title ?? "book"}`);
 
-    if (book.coverUrl) {
-      const cover = document.createElement("img");
-      cover.className = "sr-card-cover";
-      cover.alt = `${book.title ?? "Book"} cover`;
-      cover.src = book.coverUrl;
-      cover.addEventListener("error", () => {
-        cover.replaceWith(buildCoverPlaceholder(book.title));
-      });
-      coverLink.appendChild(cover);
-    } else {
-      coverLink.appendChild(buildCoverPlaceholder(book.title));
-    }
-
-    const body = document.createElement("div");
-    body.className = "sr-card-body";
-
-    if (book.volumeNumber !== null && book.volumeNumber !== undefined) {
-      const volume = document.createElement("p");
-      volume.className = "sr-volume";
-      volume.textContent = `Volume ${book.volumeNumber}`;
-      body.appendChild(volume);
-    }
-
-    const titleLink = document.createElement("a");
-    titleLink.className = "sr-card-title";
-    titleLink.href = `bookview.html?id=${book.bookId}`;
-    titleLink.textContent = book.title ?? "Untitled Book";
-
-    const author = document.createElement("p");
-    author.className = "sr-card-author";
-    author.textContent = `By ${book.authorUsername ?? "Unknown author"}`;
-
-    const meta = document.createElement("div");
-    meta.className = "sr-card-meta";
-
-    const series = document.createElement("span");
-    series.className = "sr-meta-pill";
-    series.textContent = book.seriesName || "Standalone";
-
-    const publishDate = document.createElement("span");
-    publishDate.className = "sr-meta-text";
-    publishDate.textContent = formatDate(book.publishDate);
-
-    meta.appendChild(series);
-    meta.appendChild(publishDate);
-
-    const actionRow = document.createElement("div");
-    actionRow.className = "sr-card-actions";
-
-    const openBtn = document.createElement("a");
-    openBtn.className = "sr-open-btn";
-    openBtn.href = `bookview.html?id=${book.bookId}`;
-    openBtn.textContent = "View Details";
-
-    actionRow.appendChild(openBtn);
-
-    body.appendChild(titleLink);
-    body.appendChild(author);
-    body.appendChild(meta);
-    body.appendChild(actionRow);
-
-    card.appendChild(coverLink);
-    card.appendChild(body);
-
-    return card;
+  if (book.coverUrl) {
+    const cover = document.createElement("img");
+    cover.className = "sr-card-cover";
+    cover.alt = `${book.title ?? "Book"} cover`;
+    cover.src = book.coverUrl;
+    cover.addEventListener("error", () => {
+      cover.replaceWith(buildCoverPlaceholder(book.title));
+    });
+    coverLink.appendChild(cover);
+  } else {
+    coverLink.appendChild(buildCoverPlaceholder(book.title));
   }
+
+  const body = document.createElement("div");
+  body.className = "sr-card-body";
+
+  if (book.volumeNumber !== null && book.volumeNumber !== undefined) {
+    const volume = document.createElement("p");
+    volume.className = "sr-volume";
+    volume.textContent = `Volume ${book.volumeNumber}`;
+    body.appendChild(volume);
+  }
+
+  const titleLink = document.createElement("a");
+  titleLink.className = "sr-card-title";
+  titleLink.href = `bookview.html?id=${book.bookId}`;
+  titleLink.textContent = book.title ?? "Untitled Book";
+
+  const author = document.createElement("a");
+  author.className = "sr-card-author";
+  author.textContent = `By ${book.authorUsername ?? "Unknown author"}`;
+
+  if (book.authorUsername) {
+    author.href = `profile.html?username=${encodeURIComponent(book.authorUsername)}`;
+  } else {
+    author.href = "#";
+  }
+
+  const meta = document.createElement("div");
+  meta.className = "sr-card-meta";
+
+  const series = document.createElement("span");
+  series.className = "sr-meta-pill";
+  series.textContent = book.seriesName || "Standalone";
+
+  const publishDate = document.createElement("span");
+  publishDate.className = "sr-meta-text";
+  publishDate.textContent = formatDate(book.publishDate);
+
+  meta.appendChild(series);
+  meta.appendChild(publishDate);
+
+  const actionRow = document.createElement("div");
+  actionRow.className = "sr-card-actions";
+
+  const openBtn = document.createElement("a");
+  openBtn.className = "sr-open-btn";
+  openBtn.href = `bookview.html?id=${book.bookId}`;
+  openBtn.textContent = "View Details";
+
+  actionRow.appendChild(openBtn);
+
+  body.appendChild(titleLink);
+  body.appendChild(author);
+  body.appendChild(meta);
+  body.appendChild(actionRow);
+
+  card.appendChild(coverLink);
+  card.appendChild(body);
+
+  return card;
+}
 
   function renderResults(pageData, payload) {
     const books = pageData?.content ?? [];

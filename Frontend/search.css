@@ -475,3 +475,15 @@
 .sr-results-grid[hidden] {
   display: none !important;
 }
+
+.sr-card-author {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--red);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.sr-card-author:hover {
+  text-decoration: underline;
+}
