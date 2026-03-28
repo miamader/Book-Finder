@@ -345,7 +345,9 @@ function renderChapters(pageData) {
   refs.startReadingBtn.disabled = false;
   refs.tocBtn.disabled = false;
 
-  const hasPreview = chapters.some((chapter) => chapter.preview === true || chapter.isPreview === true);
+  const hasPreview = chapters.some(
+    (chapter) => chapter.preview === true || chapter.isPreview === true
+  );
   refs.previewBtn.hidden = !hasPreview;
 
   chapters.forEach((chapter) => {
@@ -448,6 +450,7 @@ function renderReviewSummary(summary, reviewsPage) {
 function renderReviews(pageData, append) {
   if (!append) {
     refs.reviewsGrid.innerHTML = "";
+    state.reviewsLoaded = 0;
   }
 
   const reviews = pageData?.content ?? [];
@@ -533,23 +536,14 @@ async function openChapter(chapter) {
     return;
   }
 
-  async function openChapter(chapter) {
-    const url = await getReadableChapterUrl(chapter);
+  const res = await fetch(url);
+  const rawContent = await res.text();
 
-    if (!url) {
-      alert("Could not open this chapter.");
-      return;
-    }
+  localStorage.setItem("activeChapterTitle", chapter.title || "");
+  localStorage.setItem("activeChapterContent", rawContent);
+  localStorage.setItem("activeChapterType", chapter.fileType || "HTML");
 
-    const res = await fetch(url);
-    const rawContent = await res.text();
-
-    localStorage.setItem("activeChapterTitle", chapter.title || "");
-    localStorage.setItem("activeChapterContent", rawContent);
-    localStorage.setItem("activeChapterType", chapter.fileType);
-
-    window.location.href = "chapter-reader.html";
-  }
+  window.location.href = "chapter-reader.html";
 }
 
 async function handleOpenPreview() {
@@ -562,14 +556,7 @@ async function handleOpenPreview() {
     return;
   }
 
-  const previewData = await fetchJsonOrNull(`/api/chapters/${previewChapter.chapterId}/preview`);
-
-  if (!previewData?.previewUrl) {
-    alert("Could not open the preview.");
-    return;
-  }
-
-  window.location.href = previewData.previewUrl;
+  await openChapter(previewChapter);
 }
 
 async function handleStartReading() {
