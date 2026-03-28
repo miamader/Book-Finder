@@ -5,58 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Finder | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- styles -->
+
     <link rel="stylesheet" href="styles/global.css" />
     <link rel="stylesheet" href="styles/navbar.css" />
-
     <link rel="stylesheet" href="dashboard.css"/>
-    <!-- components -->
+
     <script src="components/navbar.js" defer></script>
+    <script src="dashboard.js" defer></script>
 </head>
 
 <body>
- <bf-navbar active="mybooks"></bf-navbar>
+<bf-navbar active="mybooks"></bf-navbar>
 
-    <div class="main-content">
-        <section class="shelf-container">
-            <h2>Continue Reading</h2>
-            <div class="shelf-card">
-                <div class="shelf-header">
-                    <h3>Currently Reading Books (5)</h3>
-                    <button class="btn-red">View All Books ></button>
-                </div>
-                <div class="book-list">
-                    <div class="book-item"><div class="cover"></div><p>Book 1</p><span>By Author 1</span></div>
-                    <div class="book-item"><div class="cover"></div><p>Book 2</p><span>By Author 2</span></div>
-                    <div class="book-item"><div class="cover"></div><p>Book 3</p><span>By Author 3</span></div>
-                </div>
+<div class="main-content">
+    <section class="shelf-container">
+        <h2>Continue Reading</h2>
+        <div class="shelf-card">
+            <div class="shelf-header">
+                <h3 id="currentlyReadingTitle">Currently Reading Books</h3>
+                <a class="btn-red" href="search.html">Browse Books ></a>
             </div>
-        </section>
 
-        <section class="shelf-container">
-            <h2>Your Published Books</h2>
-            <div class="shelf-card">
-                <div class="shelf-header">
-                    <h3>Published Books</h3>
-                    <button class="btn-red">View All Books ></button>
+            <div class="shelf-content">
+                <div id="currentlyReadingEmpty" class="shelf-empty" hidden>
+                    You are not currently reading any books yet.
                 </div>
-                <div class="book-list">
-                    <div class="book-item"><div class="cover"></div><p>The Tale of Dragons</p><span>35 parts</span></div>
-                    <div class="book-item"><div class="cover"></div><p>The Tale of Serpents</p><span>24 parts</span></div>
+                <div id="currentlyReadingList" class="book-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="shelf-container">
+        <h2>Your Published Books</h2>
+        <div class="shelf-card">
+            <div class="shelf-header">
+                <h3 id="publishedBooksTitle">Published Books</h3>
+                <a class="btn-red" href="managebooks.html">View All Books ></a>
+            </div>
+
+            <div class="shelf-content">
+                <div id="publishedBooksEmpty" class="shelf-empty" hidden>
+                    You do not have any published books yet.
                 </div>
+                <div id="publishedBooksList" class="book-list"></div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="discovery-section">
-            <h2>Discover a New Book to Read</h2>
-            <div class="discovery-grid">
-                <div class="disc-card red"><h3>By the Community</h3><p>recommendations based on favorites</p></div>
-                <div class="disc-card dark"><h3>By books</h3><p>recommendations based on choices</p></div>
-                <div class="disc-card pink"><h3>By Genre</h3><p>recommendations based on genres</p></div>
-            </div>
-        </section>
-    </div>
+    <section class="discovery-section">
+        <h2>Discover a New Book to Read</h2>
+        <div class="discovery-grid">
+            <a class="disc-card red" href="search.html">
+                <h3>By the Community</h3>
+                <p>recommendations based on favorites</p>
+            </a>
 
-    <script src="dashboard.js"></script>
+            <a class="disc-card dark" href="search.html">
+                <h3>By books</h3>
+                <p>recommendations based on choices</p>
+            </a>
+
+            <a class="disc-card pink" href="search.html">
+                <h3>By Genre</h3>
+                <p>recommendations based on genres</p>
+            </a>
+        </div>
+    </section>
+</div>
 </body>
 </html>
