@@ -1,195 +1,303 @@
 const API_BASE = "https://book-finder-production-5c8b.up.railway.app";
 
-/* --current user data--
-   temporary fallback object
-------------------------------------------------------------------------------------*/
-var currentUser = {
-  username:   "Username1",
-  firstName:  "",
-  lastName:   "",
-  avatarUrl:  "",
-  joinedDate: "Feb 2026",
-  bio:        "",
-  books: []
+const state = {
+  token: localStorage.getItem("token"),
+  profile: null,
+  isOwnProfile: false,
+  isEditing: false,
+  viewedUsername: null
 };
 
-/* -carousel settings- */
-var VISIBLE = 4;    
-var CARD_W  = 184;  
-var currentIndex = 0;
+const refs = {};
 
-/* -render user profile- */
-function renderProfile(user) {
-  document.getElementById("profileUsername").textContent =
-    user.username || "Username1";
-
-  var parts = [];
-  if (user.firstName) parts.push(user.firstName);
-  if (user.lastName)  parts.push(user.lastName);
-  document.getElementById("profileFullname").textContent =
-    parts.length > 0 ? parts.join(" ") : "Firstname Lastname";
-
-  document.getElementById("profileJoined").textContent =
-    user.joinedDate || "—";
-
-  if (user.avatarUrl) {
-    var img = document.createElement("img");
-    img.src = user.avatarUrl;
-    img.alt = user.username;
-    var avatarWrap = document.getElementById("profileAvatar");
-    avatarWrap.innerHTML = "";
-    avatarWrap.appendChild(img);
-  }
-
-  var bioEl = document.getElementById("profileBio");
-  if (user.bio && user.bio.trim()) {
-    bioEl.textContent = user.bio;
-    bioEl.classList.remove("empty-state");
-  } else {
-    bioEl.textContent = "User hasn't created a bio";
-    bioEl.classList.add("empty-state");
-  }
-
-  renderBooks(user.books || []);
-}
-
-/* -render book carousel- */
-function renderBooks(books) {
-  var track    = document.getElementById("booksTrack");
-  var dotsWrap = document.getElementById("carouselDots");
-
-  track.innerHTML    = "";
-  dotsWrap.innerHTML = "";
-  currentIndex       = 0;
-
-  var displayBooks = books.length > 0 ? books : [null];
-
-  displayBooks.forEach(function(book) {
-    var card = document.createElement("div");
-    card.className = "book-card";
-
-    if (book) {
-      var cover = document.createElement("div");
-      cover.className = "book-cover";
-
-      var img = document.createElement("img");
-      img.src = book.coverUrl || "svg_files/bookfinder logo.svg";
-      img.alt = book.title || "Book cover";
-      img.onerror = function() {
-        img.src = "svg_files/bookfinder logo.svg";
-      };
-      cover.appendChild(img);
-
-      var title = document.createElement("div");
-      title.className = "book-title";
-      title.textContent = book.title || "Untitled";
-
-      var author = document.createElement("div");
-      author.className = "book-author";
-      author.textContent = book.authorUsername || "Unknown author";
-
-      card.appendChild(cover);
-      card.appendChild(title);
-      card.appendChild(author);
-
-    } else {
-      card.innerHTML =
-        '<div class="book-cover empty">' +
-          '<svg width="48" height="48" fill="none" stroke="#999" stroke-width="1.2" viewBox="0 0 24 24">' +
-          '<rect x="3" y="2" width="13" height="20" rx="1"/>' +
-          '<path d="M7 6h5M7 10h5M7 14h3"/>' +
-          '</svg>' +
-        '</div>' +
-        '<div class="book-title" style="color:#bbb;">—</div>' +
-        '<div class="book-author" style="color:#ccc;">No books yet</div>';
-    }
-
-    track.appendChild(card);
-  });
-
-  var pages = Math.max(1, Math.ceil(displayBooks.length / VISIBLE));
-  for (var p = 0; p < pages; p++) {
-    (function(pageIndex) {
-      var dot = document.createElement("div");
-      dot.className = "dot" + (pageIndex === 0 ? " active" : "");
-      dot.addEventListener("click", function() { goTo(pageIndex); });
-      dotsWrap.appendChild(dot);
-    })(p);
-  }
-
-  updateCarousel();
-}
-
-function goTo(page) {
-  var displayBooks = currentUser.books.length > 0 ? currentUser.books : [null];
-  var pages = Math.ceil(displayBooks.length / VISIBLE);
-  currentIndex = Math.max(0, Math.min(page, pages - 1));
-  updateCarousel();
-}
-
-function updateCarousel() {
-  var track        = document.getElementById("booksTrack");
-  var dots         = document.querySelectorAll(".dot");
-  var displayBooks = currentUser.books.length > 0 ? currentUser.books : [null];
-  var pages        = Math.ceil(displayBooks.length / VISIBLE);
-
-  track.style.transform = "translateX(-" + (currentIndex * VISIBLE * CARD_W) + "px)";
-
-  dots.forEach(function(dot, i) {
-    dot.classList.toggle("active", i === currentIndex);
-  });
-
-  document.getElementById("prevBtn").disabled = currentIndex === 0;
-  document.getElementById("nextBtn").disabled = currentIndex >= pages - 1;
-}
-
-document.getElementById("prevBtn").addEventListener("click", function() {
-  goTo(currentIndex - 1);
-});
-
-document.getElementById("nextBtn").addEventListener("click", function() {
-  goTo(currentIndex + 1);
-});
-
-async function loadCurrentUserProfile() {
-  var token = localStorage.getItem("token");
-
-  if (!token) {
-    renderProfile(currentUser);
-    return;
-  }
+document.addEventListener("DOMContentLoaded", async () => {
+  cacheRefs();
+  bindEvents();
 
   try {
-    var response = await fetch(`${API_BASE}/api/users/me`, {
-      headers: {
-        "Authorization": "Bearer " + token
-      }
-    });
+    setLoading(true);
+    await loadProfilePage();
+    refs.profileContent.hidden = false;
+  } catch (error) {
+    console.error("Could not load profile:", error);
+    showError(error.message || "Could not load the profile.");
+  } finally {
+    setLoading(false);
+  }
+});
 
-    if (!response.ok) {
-      renderProfile(currentUser);
+function cacheRefs() {
+  refs.profileLoading = document.getElementById("profileLoading");
+  refs.profileError = document.getElementById("profileError");
+  refs.profileErrorText = document.getElementById("profileErrorText");
+  refs.profileContent = document.getElementById("profileContent");
+
+  refs.profileAvatar = document.getElementById("profileAvatar");
+  refs.profileEyebrow = document.getElementById("profileEyebrow");
+  refs.profileUsername = document.getElementById("profileUsername");
+  refs.profileFullname = document.getElementById("profileFullname");
+  refs.profileJoined = document.getElementById("profileJoined");
+  refs.profileEmailCard = document.getElementById("profileEmailCard");
+  refs.profileEmail = document.getElementById("profileEmail");
+  refs.profileBookCount = document.getElementById("profileBookCount");
+  refs.profileNotice = document.getElementById("profileNotice");
+  refs.profileBio = document.getElementById("profileBio");
+
+  refs.editProfileBtn = document.getElementById("editProfileBtn");
+  refs.editSection = document.getElementById("editSection");
+  refs.profileForm = document.getElementById("profileForm");
+  refs.firstNameInput = document.getElementById("firstNameInput");
+  refs.lastNameInput = document.getElementById("lastNameInput");
+  refs.bioInput = document.getElementById("bioInput");
+  refs.saveProfileBtn = document.getElementById("saveProfileBtn");
+  refs.cancelEditBtn = document.getElementById("cancelEditBtn");
+
+  refs.booksMeta = document.getElementById("booksMeta");
+  refs.booksEmpty = document.getElementById("booksEmpty");
+  refs.booksGrid = document.getElementById("booksGrid");
+}
+
+function bindEvents() {
+  refs.editProfileBtn.addEventListener("click", () => {
+    state.isEditing = true;
+    fillEditForm();
+    renderEditState();
+  });
+
+  refs.cancelEditBtn.addEventListener("click", () => {
+    state.isEditing = false;
+    renderEditState();
+  });
+
+  refs.profileForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!state.isOwnProfile || !state.token) {
       return;
     }
 
-    var user = await response.json();
+    refs.saveProfileBtn.disabled = true;
 
-    currentUser = {
-      username: user.username || "Username1",
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      avatarUrl: user.avatarUrl || "",
-      joinedDate: user.joinDate || "—",
-      bio: user.bio || "",
-      books: user.books || []
-    };
+    try {
+      const updatedProfile = await fetchJson("/api/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${state.token}`
+        },
+        body: JSON.stringify({
+          firstName: refs.firstNameInput.value.trim() || null,
+          lastName: refs.lastNameInput.value.trim() || null,
+          bio: refs.bioInput.value.trim() || null
+        })
+      });
 
-    renderProfile(currentUser);
+      state.profile = updatedProfile;
+      state.isEditing = false;
+      renderProfile();
+      renderEditState();
+      setNotice("Profile updated successfully.");
+    } catch (error) {
+      console.error("Could not update profile:", error);
+      alert(error.message || "Could not update the profile.");
+    } finally {
+      refs.saveProfileBtn.disabled = false;
+    }
+  });
+}
 
+function setLoading(isLoading) {
+  refs.profileLoading.hidden = !isLoading;
+}
+
+function showError(message) {
+  refs.profileLoading.hidden = true;
+  refs.profileContent.hidden = true;
+  refs.profileError.hidden = false;
+  refs.profileErrorText.textContent = message;
+}
+
+function setNotice(message = "") {
+  if (!message) {
+    refs.profileNotice.hidden = true;
+    refs.profileNotice.textContent = "";
+    return;
+  }
+
+  refs.profileNotice.hidden = false;
+  refs.profileNotice.textContent = message;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "—";
+
+  const date = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+
+  return date.toLocaleDateString();
+}
+
+function buildAvatarFallback(username) {
+  const first = (username || "U").trim().charAt(0).toUpperCase();
+  return first || "U";
+}
+
+function buildFullName(profile) {
+  const parts = [];
+
+  if (profile.firstName) parts.push(profile.firstName);
+  if (profile.lastName) parts.push(profile.lastName);
+
+  return parts.length > 0 ? parts.join(" ") : "No name added yet";
+}
+
+async function fetchJson(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, options);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText && errorText.trim() ? errorText : `Request failed (${response.status})`);
+  }
+
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+async function fetchJsonOrNull(path, options = {}) {
+  try {
+    const response = await fetch(`${API_BASE}${path}`, options);
+    if (!response.ok) return null;
+    if (response.status === 204) return null;
+    return response.json();
   } catch (error) {
-    console.error("Error loading profile:", error);
-    renderProfile(currentUser);
+    return null;
   }
 }
 
-/* render init */
-loadCurrentUserProfile();
+async function loadProfilePage() {
+  const params = new URLSearchParams(window.location.search);
+  const usernameParam = params.get("username")?.trim() || null;
+
+  let myProfile = null;
+
+  if (state.token) {
+    myProfile = await fetchJsonOrNull("/api/users/me", {
+      headers: {
+        Authorization: `Bearer ${state.token}`
+      }
+    });
+  }
+
+  if (!usernameParam) {
+    if (!myProfile) {
+      throw new Error("You need to log in to view your profile.");
+    }
+
+    state.profile = myProfile;
+    state.isOwnProfile = true;
+    state.viewedUsername = myProfile.username;
+    renderProfile();
+    return;
+  }
+
+  if (myProfile && myProfile.username.toLowerCase() === usernameParam.toLowerCase()) {
+    state.profile = myProfile;
+    state.isOwnProfile = true;
+    state.viewedUsername = myProfile.username;
+    renderProfile();
+    return;
+  }
+
+  const publicProfile = await fetchJson(`/api/users/profile/${encodeURIComponent(usernameParam)}`);
+
+  state.profile = publicProfile;
+  state.isOwnProfile = false;
+  state.viewedUsername = publicProfile.username;
+  renderProfile();
+}
+
+function renderProfile() {
+  const profile = state.profile;
+  const books = Array.isArray(profile?.books) ? profile.books : [];
+
+  refs.profileAvatar.textContent = buildAvatarFallback(profile?.username);
+  refs.profileEyebrow.textContent = state.isOwnProfile ? "My Profile" : "Author Profile";
+  refs.profileUsername.textContent = profile?.username || "Unknown User";
+  refs.profileFullname.textContent = buildFullName(profile || {});
+  refs.profileJoined.textContent = formatDate(profile?.joinDate);
+  refs.profileBookCount.textContent = String(books.length);
+
+  refs.profileBio.textContent = profile?.bio && profile.bio.trim()
+    ? profile.bio
+    : "User hasn't created a bio yet.";
+  refs.profileBio.classList.toggle("is-empty", !(profile?.bio && profile.bio.trim()));
+
+  refs.profileEmailCard.hidden = !state.isOwnProfile;
+  refs.profileEmail.textContent = state.isOwnProfile ? (profile?.email || "—") : "—";
+
+  refs.editProfileBtn.hidden = !state.isOwnProfile;
+
+  setNotice(state.isOwnProfile ? "This is how your public author profile will appear to other users." : "");
+
+  renderBooks(books);
+  renderEditState();
+}
+
+function fillEditForm() {
+  refs.firstNameInput.value = state.profile?.firstName || "";
+  refs.lastNameInput.value = state.profile?.lastName || "";
+  refs.bioInput.value = state.profile?.bio || "";
+}
+
+function renderEditState() {
+  refs.editSection.hidden = !(state.isOwnProfile && state.isEditing);
+  refs.editProfileBtn.hidden = !state.isOwnProfile || state.isEditing;
+}
+
+function renderBooks(books) {
+  refs.booksGrid.innerHTML = "";
+
+  if (!Array.isArray(books) || books.length === 0) {
+    refs.booksEmpty.hidden = false;
+    refs.booksMeta.textContent = "No published books to show.";
+    return;
+  }
+
+  refs.booksEmpty.hidden = true;
+  refs.booksMeta.textContent = `${books.length} published book${books.length === 1 ? "" : "s"}.`;
+
+  books.forEach((book) => {
+    const link = document.createElement("a");
+    link.className = "pf-book-card";
+    link.href = `bookview.html?id=${book.bookId}`;
+
+    const cover = document.createElement("div");
+    cover.className = "pf-book-cover";
+
+    const img = document.createElement("img");
+    img.src = book.coverUrl || "svg_files/bookfinder logo.svg";
+    img.alt = book.title || "Book cover";
+    img.onerror = () => {
+      img.src = "svg_files/bookfinder logo.svg";
+    };
+    cover.appendChild(img);
+
+    const title = document.createElement("p");
+    title.className = "pf-book-title";
+    title.textContent = book.title || "Untitled Book";
+
+    const meta = document.createElement("p");
+    meta.className = "pf-book-meta";
+
+    const metaParts = [];
+    if (book.seriesName) metaParts.push(book.seriesName);
+    if (book.publishDate) metaParts.push(formatDate(book.publishDate));
+    meta.textContent = metaParts.length > 0 ? metaParts.join(" • ") : "Standalone";
+
+    link.appendChild(cover);
+    link.appendChild(title);
+    link.appendChild(meta);
+
+    refs.booksGrid.appendChild(link);
+  });
+}

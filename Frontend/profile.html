@@ -3,66 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BookFinder | My Profile</title>
- <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- styles -->
-    <link rel="stylesheet" href="styles/global.css" />
-    <link rel="stylesheet" href="styles/navbar.css" />
-
-    <link rel="stylesheet" href="profile.css"/>
-    <!-- components -->
-    <script src="components/navbar.js" defer></script>
+  <title>BookFinder | Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/global.css" />
+  <link rel="stylesheet" href="styles/navbar.css" />
+  <link rel="stylesheet" href="profile.css"/>
+  <script src="components/navbar.js" defer></script>
+  <script src="profile.js" defer></script>
 </head>
 <body>
-    <bf-navbar active="home"></bf-navbar>
+<bf-navbar active="home"></bf-navbar>
 
-  <div class="page-container">
+<main class="pf-page">
+  <div class="pf-wrap">
+    <section id="profileLoading" class="pf-state">
+      <div class="pf-spinner" aria-hidden="true"></div>
+      <p>Loading profile...</p>
+    </section>
 
-    <!-- profile header -->
-    <div class="profile-header">
-      <div class="avatar-wrap" id="profileAvatar">
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-      </div>
-      <div class="profile-info">
-        <div class="profile-username" id="profileUsername">Username1</div>
-        <div class="profile-fullname" id="profileFullname">Firstname Lastname</div>
-        <hr class="profile-divider"/>
-        <div class="profile-joined">Joined: <strong id="profileJoined">—</strong></div>
-      </div>
-    </div>
+    <section id="profileError" class="pf-state pf-state-error" hidden>
+      <h1>Could not load this profile</h1>
+      <p id="profileErrorText">Please try again.</p>
+    </section>
 
-    <!-- bio -->
-    <div class="bio-section">
-      <div class="section-title">Bio</div>
-      <p class="bio-text" id="profileBio">User hasn't created a bio</p>
-    </div>
+    <section id="profileContent" hidden>
+      <header class="pf-hero">
+        <div class="pf-avatar" id="profileAvatar">U</div>
 
-    <!-- books carousel -->
-    <div class="books-section">
-      <div class="section-title">Books Created by This Author</div>
-      <div class="carousel-nav">
-        <button class="carousel-btn" id="prevBtn" disabled>
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-        </button>
-        <button class="carousel-btn" id="nextBtn">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
-      </div>
-      <div class="books-carousel-wrapper">
-        <div class="books-track" id="booksTrack"></div>
-      </div>
-      <div class="carousel-dots" id="carouselDots"></div>
-    </div>
+        <div class="pf-hero-copy">
+          <p id="profileEyebrow" class="pf-eyebrow">Author Profile</p>
+          <h1 id="profileUsername" class="pf-username">Username</h1>
+          <p id="profileFullname" class="pf-fullname">No name added yet</p>
 
+          <div class="pf-meta-grid">
+            <div class="pf-meta-item">
+              <span class="pf-meta-label">Joined</span>
+              <span id="profileJoined" class="pf-meta-value">—</span>
+            </div>
+
+            <div class="pf-meta-item" id="profileEmailCard" hidden>
+              <span class="pf-meta-label">Email</span>
+              <span id="profileEmail" class="pf-meta-value">—</span>
+            </div>
+
+            <div class="pf-meta-item">
+              <span class="pf-meta-label">Published Books</span>
+              <span id="profileBookCount" class="pf-meta-value">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pf-hero-actions">
+          <button id="editProfileBtn" class="pf-btn pf-btn-primary" type="button" hidden>
+            Edit Profile
+          </button>
+        </div>
+      </header>
+
+      <section id="profileNotice" class="pf-notice" hidden></section>
+
+      <section class="pf-section">
+        <div class="pf-section-head">
+          <h2 class="pf-section-title">Bio</h2>
+        </div>
+        <p id="profileBio" class="pf-bio">User hasn't created a bio yet.</p>
+      </section>
+
+      <section id="editSection" class="pf-section" hidden>
+        <div class="pf-section-head">
+          <h2 class="pf-section-title">Edit Profile</h2>
+        </div>
+
+        <form id="profileForm" class="pf-form">
+          <div class="pf-form-grid">
+            <label class="pf-field">
+              <span>First name</span>
+              <input id="firstNameInput" type="text" maxlength="80" />
+            </label>
+
+            <label class="pf-field">
+              <span>Last name</span>
+              <input id="lastNameInput" type="text" maxlength="80" />
+            </label>
+          </div>
+
+          <label class="pf-field">
+            <span>Bio</span>
+            <textarea id="bioInput" rows="6" maxlength="1600"></textarea>
+          </label>
+
+          <div class="pf-form-actions">
+            <button id="saveProfileBtn" class="pf-btn pf-btn-primary" type="submit">Save Changes</button>
+            <button id="cancelEditBtn" class="pf-btn pf-btn-secondary" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="pf-section">
+        <div class="pf-section-head">
+          <div>
+            <h2 class="pf-section-title">Books Created by This Author</h2>
+            <p id="booksMeta" class="pf-section-subtitle">Loading books...</p>
+          </div>
+        </div>
+
+        <div id="booksEmpty" class="pf-empty" hidden>
+          No published books yet.
+        </div>
+
+        <div id="booksGrid" class="pf-books-grid"></div>
+      </section>
+    </section>
   </div>
-
-  <script src="profile.js"></script>
+</main>
 </body>
 </html>
