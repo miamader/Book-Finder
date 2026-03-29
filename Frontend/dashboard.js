@@ -16,6 +16,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const publishedBooksList = document.getElementById("publishedBooksList");
   const publishedBooksEmpty = document.getElementById("publishedBooksEmpty");
 
+  const topRatedBtn = document.getElementById("topRatedBtn");
+  const authorDiscoveryBtn = document.getElementById("authorDiscoveryBtn");
+  const genreDiscoveryBtn = document.getElementById("genreDiscoveryBtn");
+  const authorDiscoveryText = document.getElementById("authorDiscoveryText");
+  const genreDiscoveryText = document.getElementById("genreDiscoveryText");
+
+  let latestReadingBook = null;
+
   function parseErrorText(text, fallback) {
     return text && text.trim() ? text : fallback;
   }
@@ -29,11 +37,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     return date.toLocaleDateString();
   }
 
-  async function fetchJson(path) {
+  async function fetchJson(path, requiresAuth = true) {
+    const headers = {};
+
+    if (requiresAuth) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${DASHBOARD_API_BASE}${path}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers
     });
 
     if (!response.ok) {
@@ -104,13 +116,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const content = Array.isArray(books) ? books : [];
     currentlyReadingTitle.textContent = `Currently Reading Books (${content.length})`;
+    latestReadingBook = content.length > 0 ? content[0] : null;
 
     if (content.length === 0) {
       currentlyReadingEmpty.hidden = false;
+      authorDiscoveryText.textContent = "Start reading a book to discover more from the same author.";
+      genreDiscoveryText.textContent = "Start reading a book to explore similar genres.";
       return;
     }
 
     currentlyReadingEmpty.hidden = true;
+
+    authorDiscoveryText.textContent = `Find more books by ${latestReadingBook.authorUsername || "this author"}.`;
+    genreDiscoveryText.textContent = `Explore books related to ${latestReadingBook.title || "your latest read"}.`;
 
     content.forEach((book) => {
       currentlyReadingList.appendChild(createBookItem(book, "reading"));
@@ -134,6 +152,42 @@ document.addEventListener("DOMContentLoaded", async () => {
       publishedBooksList.appendChild(createBookItem(book, "published"));
     });
   }
+
+  topRatedBtn.addEventListener("click", () => {
+    window.location.href = "search.html?topRated=true";
+  });
+
+  authorDiscoveryBtn.addEventListener("click", () => {
+    if (!latestReadingBook?.authorUsername) {
+      window.location.href = "search.html";
+      return;
+    }
+
+    window.location.href = `search.html?author=${encodeURIComponent(latestReadingBook.authorUsername)}`;
+  });
+
+  genreDiscoveryBtn.addEventListener("click", async () => {
+    if (!latestReadingBook?.bookId) {
+      window.location.href = "search.html";
+      return;
+    }
+
+    try {
+      const bookDetails = await fetchJson(`/api/books/${latestReadingBook.bookId}/details`, false);
+      const genres = Array.isArray(bookDetails?.genres) ? bookDetails.genres : [];
+      const firstGenre = genres[0];
+
+      if (!firstGenre) {
+        window.location.href = "search.html";
+        return;
+      }
+
+      window.location.href = `search.html?genres=${encodeURIComponent(firstGenre)}`;
+    } catch (error) {
+      console.error("Could not load genre discovery details:", error);
+      window.location.href = "search.html";
+    }
+  });
 
   try {
     const [currentlyReading, publishedBooks] = await Promise.all([

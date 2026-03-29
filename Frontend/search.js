@@ -35,6 +35,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     initialSeriesId: "",
     initialGenres: [],
     initialPage: 0,
+    initialTopRated: false,
+    topRatedMode: false,
     isLoading: false
   };
 
@@ -148,19 +150,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  function updateUrl(page = 0) {
-    const params = new URLSearchParams();
-    const keyword = keywordInput.value.trim();
-    const authorName = authorInput.value.trim();
-    const seriesId = seriesSelect.value.trim();
-    const genres = getSelectedGenres();
-    const hashtags = [...hashtagSet];
+  function hasActiveFilters(payload) {
+    return Boolean(
+      payload.keyword ||
+      payload.authorName ||
+      payload.seriesId ||
+      (payload.genres && payload.genres.length > 0) ||
+      (payload.hashtags && payload.hashtags.length > 0)
+    );
+  }
 
-    if (keyword) params.set("q", keyword);
-    if (authorName) params.set("author", authorName);
-    if (seriesId) params.set("seriesId", seriesId);
-    if (genres.length > 0) params.set("genres", genres.join(","));
-    if (hashtags.length > 0) params.set("hashtags", hashtags.join(","));
+  function updateUrl(page = 0, payload = null) {
+    const params = new URLSearchParams();
+
+    if (state.topRatedMode && !payload) {
+      params.set("topRated", "true");
+      if (page > 0) params.set("page", String(page + 1));
+      window.history.replaceState({}, "", `search.html?${params.toString()}`);
+      return;
+    }
+
+    const resolvedPayload = payload ?? buildSearchPayload(page);
+
+    if (state.topRatedMode && !hasActiveFilters(resolvedPayload)) {
+      params.set("topRated", "true");
+      if (page > 0) params.set("page", String(page + 1));
+      window.history.replaceState({}, "", `search.html?${params.toString()}`);
+      return;
+    }
+
+    if (resolvedPayload.keyword) params.set("q", resolvedPayload.keyword);
+    if (resolvedPayload.authorName) params.set("author", resolvedPayload.authorName);
+    if (resolvedPayload.seriesId) params.set("seriesId", String(resolvedPayload.seriesId));
+    if (resolvedPayload.genres && resolvedPayload.genres.length > 0) {
+      params.set("genres", resolvedPayload.genres.join(","));
+    }
+    if (resolvedPayload.hashtags && resolvedPayload.hashtags.length > 0) {
+      params.set("hashtags", resolvedPayload.hashtags.join(","));
+    }
     if (page > 0) params.set("page", String(page + 1));
 
     const nextUrl = params.toString() ? `search.html?${params.toString()}` : "search.html";
@@ -228,87 +255,87 @@ document.addEventListener("DOMContentLoaded", async () => {
     return placeholder;
   }
 
-function createBookCard(book) {
-  const card = document.createElement("article");
-  card.className = "sr-card";
+  function createBookCard(book) {
+    const card = document.createElement("article");
+    card.className = "sr-card";
 
-  const coverLink = document.createElement("a");
-  coverLink.className = "sr-card-cover-link";
-  coverLink.href = `bookview.html?id=${book.bookId}`;
-  coverLink.setAttribute("aria-label", `Open ${book.title ?? "book"}`);
+    const coverLink = document.createElement("a");
+    coverLink.className = "sr-card-cover-link";
+    coverLink.href = `bookview.html?id=${book.bookId}`;
+    coverLink.setAttribute("aria-label", `Open ${book.title ?? "book"}`);
 
-  if (book.coverUrl) {
-    const cover = document.createElement("img");
-    cover.className = "sr-card-cover";
-    cover.alt = `${book.title ?? "Book"} cover`;
-    cover.src = book.coverUrl;
-    cover.addEventListener("error", () => {
-      cover.replaceWith(buildCoverPlaceholder(book.title));
-    });
-    coverLink.appendChild(cover);
-  } else {
-    coverLink.appendChild(buildCoverPlaceholder(book.title));
+    if (book.coverUrl) {
+      const cover = document.createElement("img");
+      cover.className = "sr-card-cover";
+      cover.alt = `${book.title ?? "Book"} cover`;
+      cover.src = book.coverUrl;
+      cover.addEventListener("error", () => {
+        cover.replaceWith(buildCoverPlaceholder(book.title));
+      });
+      coverLink.appendChild(cover);
+    } else {
+      coverLink.appendChild(buildCoverPlaceholder(book.title));
+    }
+
+    const body = document.createElement("div");
+    body.className = "sr-card-body";
+
+    if (book.volumeNumber !== null && book.volumeNumber !== undefined) {
+      const volume = document.createElement("p");
+      volume.className = "sr-volume";
+      volume.textContent = `Volume ${book.volumeNumber}`;
+      body.appendChild(volume);
+    }
+
+    const titleLink = document.createElement("a");
+    titleLink.className = "sr-card-title";
+    titleLink.href = `bookview.html?id=${book.bookId}`;
+    titleLink.textContent = book.title ?? "Untitled Book";
+
+    const author = document.createElement("a");
+    author.className = "sr-card-author";
+    author.textContent = `By ${book.authorUsername ?? "Unknown author"}`;
+
+    if (book.authorUsername) {
+      author.href = `profile.html?username=${encodeURIComponent(book.authorUsername)}`;
+    } else {
+      author.href = "#";
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "sr-card-meta";
+
+    const series = document.createElement("span");
+    series.className = "sr-meta-pill";
+    series.textContent = book.seriesName || "Standalone";
+
+    const publishDate = document.createElement("span");
+    publishDate.className = "sr-meta-text";
+    publishDate.textContent = formatDate(book.publishDate);
+
+    meta.appendChild(series);
+    meta.appendChild(publishDate);
+
+    const actionRow = document.createElement("div");
+    actionRow.className = "sr-card-actions";
+
+    const openBtn = document.createElement("a");
+    openBtn.className = "sr-open-btn";
+    openBtn.href = `bookview.html?id=${book.bookId}`;
+    openBtn.textContent = "View Details";
+
+    actionRow.appendChild(openBtn);
+
+    body.appendChild(titleLink);
+    body.appendChild(author);
+    body.appendChild(meta);
+    body.appendChild(actionRow);
+
+    card.appendChild(coverLink);
+    card.appendChild(body);
+
+    return card;
   }
-
-  const body = document.createElement("div");
-  body.className = "sr-card-body";
-
-  if (book.volumeNumber !== null && book.volumeNumber !== undefined) {
-    const volume = document.createElement("p");
-    volume.className = "sr-volume";
-    volume.textContent = `Volume ${book.volumeNumber}`;
-    body.appendChild(volume);
-  }
-
-  const titleLink = document.createElement("a");
-  titleLink.className = "sr-card-title";
-  titleLink.href = `bookview.html?id=${book.bookId}`;
-  titleLink.textContent = book.title ?? "Untitled Book";
-
-  const author = document.createElement("a");
-  author.className = "sr-card-author";
-  author.textContent = `By ${book.authorUsername ?? "Unknown author"}`;
-
-  if (book.authorUsername) {
-    author.href = `profile.html?username=${encodeURIComponent(book.authorUsername)}`;
-  } else {
-    author.href = "#";
-  }
-
-  const meta = document.createElement("div");
-  meta.className = "sr-card-meta";
-
-  const series = document.createElement("span");
-  series.className = "sr-meta-pill";
-  series.textContent = book.seriesName || "Standalone";
-
-  const publishDate = document.createElement("span");
-  publishDate.className = "sr-meta-text";
-  publishDate.textContent = formatDate(book.publishDate);
-
-  meta.appendChild(series);
-  meta.appendChild(publishDate);
-
-  const actionRow = document.createElement("div");
-  actionRow.className = "sr-card-actions";
-
-  const openBtn = document.createElement("a");
-  openBtn.className = "sr-open-btn";
-  openBtn.href = `bookview.html?id=${book.bookId}`;
-  openBtn.textContent = "View Details";
-
-  actionRow.appendChild(openBtn);
-
-  body.appendChild(titleLink);
-  body.appendChild(author);
-  body.appendChild(meta);
-  body.appendChild(actionRow);
-
-  card.appendChild(coverLink);
-  card.appendChild(body);
-
-  return card;
-}
 
   function renderResults(pageData, payload) {
     const books = pageData?.content ?? [];
@@ -319,14 +346,22 @@ function createBookCard(book) {
     state.totalElements = pageData?.totalElements ?? books.length;
 
     const activeKeyword = payload.keyword?.trim();
-    resultsSummary.textContent = activeKeyword
-      ? `Results for “${activeKeyword}”`
-      : "Browse published books";
+    const showingTopRated = state.topRatedMode && !hasActiveFilters(payload);
+
+    resultsSummary.textContent = showingTopRated
+      ? "Top Rated Books"
+      : activeKeyword
+        ? `Results for “${activeKeyword}”`
+        : "Browse published books";
 
     if (state.totalElements === 0) {
-      resultsMeta.textContent = "No published books matched your filters.";
+      resultsMeta.textContent = showingTopRated
+        ? "No rated books are available yet."
+        : "No published books matched your filters.";
     } else {
-      resultsMeta.textContent = `Showing ${books.length} of ${state.totalElements} books.`;
+      resultsMeta.textContent = showingTopRated
+        ? `Showing ${books.length} of ${state.totalElements} top rated books.`
+        : `Showing ${books.length} of ${state.totalElements} books.`;
     }
 
     if (books.length === 0) {
@@ -343,6 +378,19 @@ function createBookCard(book) {
 
     prevPageBtn.disabled = state.isLoading || state.currentPage <= 0;
     nextPageBtn.disabled = state.isLoading || state.currentPage >= state.totalPages - 1;
+  }
+
+  async function searchTopRatedBooks(page = 0) {
+    const response = await fetch(
+      `${SEARCH_API_BASE}/api/books/top-rated?page=${page}&size=${SEARCH_PAGE_SIZE}`
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to load top rated books"));
+    }
+
+    return response.json();
   }
 
   async function loadFilters() {
@@ -370,26 +418,34 @@ function createBookCard(book) {
 
   async function searchBooks(page = 0) {
     const payload = buildSearchPayload(page);
+    const useTopRated = state.topRatedMode && !hasActiveFilters(payload);
 
     try {
       setLoading(true);
-      updateUrl(page);
+      updateUrl(page, payload);
       syncNavbarSearch(keywordInput.value.trim());
 
-      const response = await fetch(`${SEARCH_API_BASE}/api/books/search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
+      let pageData;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(parseErrorText(errorText, "Failed to search books"));
+      if (useTopRated) {
+        pageData = await searchTopRatedBooks(page);
+      } else {
+        const response = await fetch(`${SEARCH_API_BASE}/api/books/search`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(parseErrorText(errorText, "Failed to search books"));
+        }
+
+        pageData = await response.json();
       }
 
-      const pageData = await response.json();
       renderResults(pageData, payload);
     } catch (error) {
       console.error("Could not search books:", error);
@@ -406,6 +462,9 @@ function createBookCard(book) {
 
   function hydrateFromUrl() {
     const params = new URLSearchParams(window.location.search);
+
+    state.initialTopRated = (params.get("topRated") ?? "") === "true";
+    state.topRatedMode = state.initialTopRated;
 
     keywordInput.value = params.get("q") ?? "";
     authorInput.value = params.get("author") ?? "";
@@ -442,6 +501,7 @@ function createBookCard(book) {
 
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    state.topRatedMode = false;
     searchBooks(0);
   });
 
