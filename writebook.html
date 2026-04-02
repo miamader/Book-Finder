@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookFinder | Write Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/writebook.css" />
+    <script type="module" src="components/navbar.js"></script>
+    <script src="js/writebook.js" defer></script>
+</head>
+<body>
+<bf-navbar active="mybooks"></bf-navbar>
+
+<main class="wb-main">
+    <div class="wb-wrap">
+        <section class="wb-topbar">
+            <div>
+                <h1 class="wb-title">Book Writer</h1>
+                <p id="bookSubtitle" class="wb-subtitle">Loading book...</p>
+            </div>
+
+            <div class="wb-top-actions">
+                <a id="backToBooksBtn" class="wb-btn wb-btn-secondary" href="managebooks.html">← Back to Books</a>
+            </div>
+        </section>
+
+        <section class="wb-layout">
+            <aside class="wb-sidebar">
+                <div class="wb-sidebar-head">
+                    <div>
+                        <h2 class="wb-sidebar-title">Chapters</h2>
+                        <p id="chaptersSummary" class="wb-sidebar-subtitle">Loading chapters...</p>
+                    </div>
+
+                    <button id="newChapterBtn" class="wb-btn wb-btn-primary" type="button">+ New Chapter</button>
+                </div>
+
+                <div id="chapterList" class="wb-chapter-list"></div>
+
+                <div id="chapterListEmpty" class="wb-empty-side" hidden>
+                    <p class="wb-empty-side-title">No chapters yet</p>
+                    <p class="wb-empty-side-text">Create your first chapter to start writing.</p>
+                </div>
+            </aside>
+
+            <section class="wb-editor-card">
+                <div class="wb-editor-head">
+                    <div>
+                        <h2 id="editorModeTitle" class="wb-editor-title">Chapter Editor</h2>
+                        <p id="editorModeSubtitle" class="wb-editor-subtitle">Select a chapter or create a new one.</p>
+                    </div>
+
+                    <div class="wb-editor-actions-top">
+                        <label class="wb-import-btn">
+                            Import .md / .html
+                            <input id="chapterImportInput" type="file" accept=".md,.html,text/markdown,text/html" hidden />
+                        </label>
+                    </div>
+                </div>
+
+                <div class="wb-divider"></div>
+
+                <form id="chapterForm" class="wb-form">
+                    <div class="wb-row">
+                        <div class="wb-field">
+                            <label class="wb-label" for="chapterNumber">Chapter Number</label>
+                            <input id="chapterNumber" class="wb-input" type="number" min="1" placeholder="1" />
+                        </div>
+
+                        <div class="wb-field">
+                            <label class="wb-label" for="chapterTitle">Chapter Title</label>
+                            <input id="chapterTitle" class="wb-input" type="text" placeholder="Chapter title" maxlength="150" />
+                        </div>
+
+                        <div class="wb-field">
+                            <label class="wb-label" for="chapterFileType">File Type</label>
+                            <select id="chapterFileType" class="wb-select">
+                                <option value="MARKDOWN">Markdown</option>
+                                <option value="HTML">HTML</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="wb-field">
+                        <label class="wb-label" for="chapterContent">Content</label>
+                        <textarea
+                                id="chapterContent"
+                                class="wb-textarea"
+                                placeholder="Start writing your chapter here..."
+                        ></textarea>
+                    </div>
+
+                    <p id="importInfo" class="wb-note">
+                        You can write directly here or import a .md or .html file and keep editing it before saving.
+                    </p>
+
+                    <div class="wb-actions">
+                        <button id="saveChapterBtn" class="wb-btn wb-btn-primary" type="submit">Save Chapter</button>
+                        <button id="deleteChapterBtn" class="wb-btn wb-btn-danger" type="button" hidden>Delete Chapter</button>
+                    </div>
+                </form>
+            </section>
+        </section>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Finder | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/dashboard.css"/>
+    <link rel="stylesheet" href="styles/navbar.css" />
+
+    <script type="module" src="components/navbar.js"></script>
+    <script src="js/dashboard.js" defer></script>
+</head>
+
+<body>
+<bf-navbar active="mybooks"></bf-navbar>
+
+<div class="main-content">
+    <section class="shelf-container">
+        <h2>Continue Reading</h2>
+        <div class="shelf-card">
+            <div class="shelf-header">
+                <h3 id="currentlyReadingTitle">Currently Reading Books</h3>
+                <a class="btn-red" href="search.html">Browse Books ></a>
+            </div>
+
+            <div class="shelf-content">
+                <div id="currentlyReadingEmpty" class="shelf-empty" hidden>
+                    You are not currently reading any books yet.
+                </div>
+                <div id="currentlyReadingList" class="book-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="shelf-container">
+        <h2>Your Published Books</h2>
+        <div class="shelf-card">
+            <div class="shelf-header">
+                <h3 id="publishedBooksTitle">Published Books</h3>
+                <a class="btn-red" href="managebooks.html">View All Books ></a>
+            </div>
+
+            <div class="shelf-content">
+                <div id="publishedBooksEmpty" class="shelf-empty" hidden>
+                    You do not have any published books yet.
+                </div>
+                <div id="publishedBooksList" class="book-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="discovery-section">
+        <h2>Find Your Next Read</h2>
+        <div class="discovery-grid">
+            <button id="topRatedBtn" class="disc-card red disc-button" type="button">
+                <h3>Top Rated Books</h3>
+                <p>Jump into the highest rated stories on BookFinder.</p>
+            </button>
+
+            <button id="authorDiscoveryBtn" class="disc-card dark disc-button" type="button">
+                <h3>More from This Author</h3>
+                <p id="authorDiscoveryText">Use your latest book to find more from the same author.</p>
+            </button>
+
+            <button id="genreDiscoveryBtn" class="disc-card pink disc-button" type="button">
+                <h3>More in This Genre</h3>
+                <p id="genreDiscoveryText">Use your latest book to explore similar genres.</p>
+            </button>
+        </div>
+    </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookFinder | Home</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/homepage.css">
+
+  <!-- NAVBAR STYLES -->
+  <link rel="stylesheet" href="styles/navbar.css">
+
+  <!-- NAVBAR COMPONENT -->
+  <script type="module" src="components/navbar.js"></script>
+</head>
+
+<body class="home-body">
+
+<!-- ✅ NEW DYNAMIC NAVBAR -->
+<bf-navbar active="home"></bf-navbar>
+
+<!-- Hero -->
+<main class="home-hero">
+  <section class="hero-left">
+    <h1 class="hero-title">
+      Looking For a Book?<br>Find it Here.
+    </h1>
+
+    <p class="hero-subtitle">
+      Join our community of thousands of authors self-publishing
+      their books for free.
+    </p>
+
+    <a class="hero-cta" href="search.html">
+      <span>Explore Now</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </section>
+
+  <section class="hero-right" aria-label="Featured books collage">
+    <div class="book-card book-1">
+      <img src="https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1555447414i/44767458.jpg" alt="Dune">
+    </div>
+
+    <div class="book-card book-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/The_Great_Gatsby_Cover_1925_Retouched.jpg/500px-The_Great_Gatsby_Cover_1925_Retouched.jpg" alt="The Great Gatsby">
+    </div>
+
+    <div class="book-card book-3">
+      <img src="https://i.ebayimg.com/images/g/Ma0AAOSwLGJl4HV~/s-l1200.jpg" alt="Once Upon a Broken Heart">
+    </div>
+
+    <div class="book-card book-4">
+      <img src="https://prodimage.images-bn.com/pimages/9781250868282_p0_v4_s600x595.jpg" alt="Mistborn">
+    </div>
+
+    <div class="book-card book-5">
+      <img src="https://s26162.pcdn.co/wp-content/uploads/2021/10/3b47d124002685f2a3c67e47383232c7.jpg" alt="Pride and Prejudice">
+    </div>
+
+    <div class="book-card book-6">
+      <img src="https://m.media-amazon.com/images/I/81gHfeKi+9L._AC_UF1000,1000_QL80_.jpg" alt="The God of the Woods">
+    </div>
+  </section>
+</main>
+
+<!-- Bottom color bar -->
+<div class="bottom-decor-bar">
+  <div class="decor-segment seg-1"></div>
+  <div class="decor-segment seg-2"></div>
+  <div class="decor-segment seg-3"></div>
+  <div class="decor-segment seg-4"></div>
+</div>
+
+<!-- Popular Now -->
+<section class="home-section">
+  <div class="section-head">
+    <h2 class="section-title">
+      <a class="section-link" href="search.html">Popular Now →</a>
+    </h2>
+  </div>
+
+  <div class="scroll-lane">
+    <div class="popular-track">
+
+      <article class="book-tile">
+        <a class="tile-cover-link" href="bookview.html?id=1">
+          <div class="tile-cover">
+            <img src="https://s26162.pcdn.co/wp-content/uploads/2021/10/3b47d124002685f2a3c67e47383232c7.jpg" alt="Pride and Prejudice">
+          </div>
+        </a>
+        <p class="tile-title">Pride &amp; Prejudice</p>
+        <p class="tile-author">Jane Austen</p>
+      </article>
+
+      <article class="book-tile">
+        <a class="tile-cover-link" href="book-view.html?id=2">
+          <div class="tile-cover">
+            <img src="https://m.media-amazon.com/images/I/71+B5VjeuJL._AC_UF1000,1000_QL80_.jpg" alt="The Night Ocean">
+          </div>
+        </a>
+        <p class="tile-title">The Night Ocean</p>
+        <p class="tile-author">Paul La Farge</p>
+      </article>
+
+      <article class="book-tile">
+        <a class="tile-cover-link" href="book-view.html?id=3">
+          <div class="tile-cover">
+            <img src="https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1661615217i/60182704.jpg" alt="The Moon and the Stars">
+          </div>
+        </a>
+        <p class="tile-title">The Moon &amp; the Stars</p>
+        <p class="tile-author">Jenna Warren</p>
+      </article>
+
+      <article class="book-tile">
+        <a class="tile-cover-link" href="book-view.html?id=4">
+          <div class="tile-cover">
+            <img src="https://cdn.myportfolio.com/df577fd9-fd27-4ad3-ae8f-02b057bad78c/4737f6bd-6dbc-4720-af05-64c9fad6712c_rw_1200.png" alt="James and the Giant Peach">
+          </div>
+        </a>
+        <p class="tile-title">James and the Giant Peach</p>
+        <p class="tile-author">Roald Dahl</p>
+      </article>
+
+      <article class="book-tile">
+        <a class="tile-cover-link" href="book-view.html?id=5">
+          <div class="tile-cover">
+            <img src="https://m.media-amazon.com/images/I/913padSawdL._AC_UF1000,1000_QL80_.jpg" alt="Dune">
+          </div>
+        </a>
+        <p class="tile-title">Dune</p>
+        <p class="tile-author">Frank Herbert</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- Browse Genres -->
+<section class="home-section">
+  <div class="section-head">
+    <h2 class="section-title">
+      <a class="section-link" href="search.html">Browse Genres →</a>
+    </h2>
+  </div>
+
+  <div class="scroll-lane" id="genreLane">
+    <div class="genre-row">
+
+      <a class="genre-card horror" href="search.html?genre=Horror">
+        <div class="genre-text"><h3>Horror</h3><p>9k Books</p></div>
+      </a>
+
+      <a class="genre-card fantasy" href="search.html?genre=Fantasy">
+        <div class="genre-text"><h3>Fantasy</h3><p>10.2k Books</p></div>
+      </a>
+
+      <a class="genre-card romance" href="search.html?genre=Romance">
+        <div class="genre-text"><h3>Romance</h3><p>7.8k Books</p></div>
+      </a>
+
+      <a class="genre-card scifi" href="search.html?genre=Sci-Fi">
+        <div class="genre-text"><h3>Sci-Fi</h3><p>6.4k Books</p></div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- Start Writing -->
+<section class="writing-cta">
+  <div class="writing-inner">
+
+    <div class="writing-left">
+      <img class="writing-illustration" src="./svg_files/writing icon.svg" alt="Writing illustration">
+    </div>
+
+    <div class="writing-right">
+      <h2 class="writing-title">Start Writing your<br>Story Today.</h2>
+
+      <p class="writing-subtitle">
+        Begin publishing your book chapter by chapter, and gain an audience of readers.
+      </p>
+
+      <a class="writing-btn" href="login.html">
+        <span>Begin Writing</span>
+        <span>→</span>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="footer-inner">
+
+      <div class="footer-brand">BookFinder</div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Work</h4>
+        <a href="#">Authors</a>
+        <a href="#">API</a>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
