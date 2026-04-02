@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       seriesEmpty.innerHTML = `
         <p class="ms-empty-title">Something went wrong</p>
         <p class="ms-empty-text">${error.message || "Could not load your series."}</p>
-        <a class="ms-empty-btn" href="createseries.html">Create Series</a>
+        <a class="ms-empty-btn" href="../createseries.html">Create Series</a>
       `;
     }
   }

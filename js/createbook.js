@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     standaloneBtn.type = "button";
     standaloneBtn.className = `cb-series-card cb-series-card-standalone ${selectedSeriesId === null ? "is-selected" : ""}`;
     standaloneBtn.innerHTML = `
-      <img class="cb-series-card-cover" src="svg_files/bookfinder logo.svg" alt="Standalone book" />
+      <img class="cb-series-card-cover" src="../svg_files/bookfinder%20logo.svg" alt="Standalone book" />
       <div class="cb-series-card-meta">
         <p class="cb-series-card-title">Standalone Book</p>
         <p class="cb-series-card-sub">Not part of a series</p>

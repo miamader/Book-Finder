@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       booksEmpty.innerHTML = `
         <p class="mb-empty-title">Something went wrong</p>
         <p class="mb-empty-text">${error.message || "Could not load your books."}</p>
-        <a class="mb-empty-btn" href="createbook.html">Create Book</a>
+        <a class="mb-empty-btn" href="../createbook.html">Create Book</a>
       `;
     }
   }
