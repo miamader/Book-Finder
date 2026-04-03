@@ -5,7 +5,6 @@ class BookFinderNav extends HTMLElement {
     this.innerHTML = `
       <header class="nav-bar">
         <div class="nav-left">
-
           <a class="nav-brand" href="index.html">
             <img src="svg_files/bookfinder logo.svg" alt="BookFinder Logo" class="nav-logo">
             <span class="nav-brand-text">BookFinder</span>
@@ -16,7 +15,6 @@ class BookFinderNav extends HTMLElement {
             <a class="nav-link" href="dashboard.html">My Books</a>
             <a class="nav-link" href="search.html">Browse</a>
           </nav>
-
         </div>
 
         <div class="nav-center">
@@ -41,17 +39,15 @@ class BookFinderNav extends HTMLElement {
           </div>
         </div>
 
-        <div class="nav-right">
-
+        <div class="nav-right is-loading">
           <!-- GUEST -->
-          <div class="nav-guest">
+          <div class="nav-guest" hidden>
             <a class="nav-btn" href="login.html">Log in</a>
             <a class="nav-btn nav-btn-solid" href="signup.html">Sign up</a>
           </div>
 
           <!-- AUTH -->
-          <div class="nav-auth">
-
+          <div class="nav-auth" hidden>
             <div class="nav-write-wrapper">
               <button class="nav-write-btn nav-write-toggle" type="button">
                 Write
@@ -82,11 +78,8 @@ class BookFinderNav extends HTMLElement {
                   Sign out
                 </button>
               </div>
-
             </div>
-
           </div>
-
         </div>
       </header>
     `;
@@ -97,12 +90,10 @@ class BookFinderNav extends HTMLElement {
     this.setupSearchNavigation();
     this.setupGlobalDropdownClose();
 
-    // ✅ Subscribe to auth state
     this.unsubscribe = auth.subscribe((state) => {
       this.updateAuthUI(state);
     });
 
-    // ✅ Initialize auth
     auth.init();
   }
 
@@ -110,9 +101,6 @@ class BookFinderNav extends HTMLElement {
     this.unsubscribe?.();
   }
 
-  // ----------------------------
-  // ACTIVE LINK
-  // ----------------------------
   highlightActive() {
     const activePage = this.getAttribute("active");
 
@@ -129,38 +117,34 @@ class BookFinderNav extends HTMLElement {
     if (link) link.classList.add("active");
   }
 
-  // ----------------------------
-  // AUTH STATE (UPDATED)
-  // ----------------------------
   updateAuthUI(state) {
     const guest = this.querySelector(".nav-guest");
     const authUI = this.querySelector(".nav-auth");
+    const right = this.querySelector(".nav-right");
     const nameEl = this.querySelector(".nav-dropdown-name");
 
-    if (!guest || !authUI) return;
+    if (!guest || !authUI || !right) return;
 
     if (state.isAuthenticated) {
-      guest.style.display = "none";
-      authUI.style.display = "flex";
+      guest.hidden = true;
+      authUI.hidden = false;
 
       const user = state.user;
-
       const displayName = user?.firstName
-          ? `${user.firstName} ${user.lastName ?? ""}`.trim()
-          : user?.username;
+        ? `${user.firstName} ${user.lastName ?? ""}`.trim()
+        : user?.username;
 
       if (nameEl) {
         nameEl.textContent = displayName || "User";
       }
     } else {
-      guest.style.display = "flex";
-      authUI.style.display = "none";
+      guest.hidden = false;
+      authUI.hidden = true;
     }
+
+    right.classList.remove("is-loading");
   }
 
-  // ----------------------------
-  // WRITE DROPDOWN
-  // ----------------------------
   setupWriteDropdown() {
     const toggle = this.querySelector(".nav-write-toggle");
     const menu = this.querySelector(".nav-write-dropdown");
@@ -174,9 +158,6 @@ class BookFinderNav extends HTMLElement {
     });
   }
 
-  // ----------------------------
-  // PROFILE DROPDOWN
-  // ----------------------------
   setupProfileDropdown() {
     const avatar = this.querySelector(".nav-avatar");
     const dropdown = this.querySelector(".nav-dropdown");
@@ -191,13 +172,10 @@ class BookFinderNav extends HTMLElement {
 
     const signoutBtn = this.querySelector("#signout-btn");
     signoutBtn?.addEventListener("click", () => {
-      auth.logout(); // ✅ CLEAN
+      auth.logout();
     });
   }
 
-  // ----------------------------
-  // CLOSE ALL DROPDOWNS
-  // ----------------------------
   setupGlobalDropdownClose() {
     document.addEventListener("click", () => {
       const writeMenu = this.querySelector(".nav-write-dropdown");
@@ -214,9 +192,6 @@ class BookFinderNav extends HTMLElement {
     });
   }
 
-  // ----------------------------
-  // SEARCH
-  // ----------------------------
   setupSearchNavigation() {
     const input = this.querySelector(".nav-search-input");
     const btn = this.querySelector(".nav-filter");
@@ -226,8 +201,8 @@ class BookFinderNav extends HTMLElement {
     const go = () => {
       const q = input.value.trim();
       window.location.href = q
-          ? `search.html?q=${encodeURIComponent(q)}`
-          : "search.html";
+        ? `search.html?q=${encodeURIComponent(q)}`
+        : "search.html";
     };
 
     input.addEventListener("keydown", (e) => {
