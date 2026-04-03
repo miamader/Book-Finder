@@ -8,7 +8,12 @@ const state = {
   reviewsPage: 0,
   reviewsTotalPages: 0,
   reviewsLoaded: 0,
-  reviewSummary: null
+  reviewSummary: null,
+  myReview: null,
+  selectedRating: 0,
+  token: null,
+  currentUsername: null,
+  isBookOwner: false
 };
 
 const refs = {};
@@ -27,20 +32,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   state.bookId = parsedBookId;
+  state.token = getToken();
+  state.currentUsername = localStorage.getItem("username");
 
   try {
     setPageLoading(true);
 
     const book = await fetchJson(`/api/books/${state.bookId}/details`);
     state.book = book;
+    state.isBookOwner = Boolean(
+      state.currentUsername &&
+      book.authorUsername &&
+      state.currentUsername === book.authorUsername
+    );
 
     renderBookDetails(book);
 
     if (book.publicationStatus === "PUBLISHED") {
-      const [chaptersResult, reviewsResult, summaryResult] = await Promise.allSettled([
+      const [chaptersResult, reviewsResult, summaryResult, myReviewResult] = await Promise.allSettled([
         fetchJson(`/api/books/${state.bookId}/chapters/list?page=0&size=100`),
-        fetchJson(`/api/books/${state.bookId}/reviews?page=0&size=${REVIEWS_PAGE_SIZE}`),
-        fetchJsonOrNull(`/api/books/${state.bookId}/reviews/summary`)
+        fetchJson(buildReviewsUrl(0)),
+        fetchJsonOrNull(`/api/books/${state.bookId}/reviews/summary`),
+        canManageOwnReview()
+          ? fetchJsonOrNull(`/api/books/${state.bookId}/reviews/me`, buildAuthRequestOptions())
+          : Promise.resolve(null)
       ]);
 
       if (chaptersResult.status === "fulfilled") {
@@ -49,16 +64,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderChapters(null);
       }
 
-      if (reviewsResult.status === "fulfilled") {
-        const reviewsPage = reviewsResult.value;
-        const reviewSummary = summaryResult.status === "fulfilled" ? summaryResult.value : null;
+      const reviewPageData = reviewsResult.status === "fulfilled" ? reviewsResult.value : null;
+      const reviewSummary = summaryResult.status === "fulfilled" ? summaryResult.value : null;
+      state.myReview = myReviewResult.status === "fulfilled" ? myReviewResult.value : null;
 
-        renderReviews(reviewsPage, false);
-        renderReviewSummary(reviewSummary, reviewsPage);
-      } else {
-        renderReviews(null, false);
-        renderReviewSummary(null, null);
-      }
+      renderReviews(reviewPageData, false);
+      renderReviewSummary(reviewSummary, reviewPageData);
+      renderReviewComposer();
     } else {
       handleDraftBook();
     }
@@ -114,6 +126,16 @@ function cacheRefs() {
   refs.reviewsEmpty = document.getElementById("reviewsEmpty");
   refs.reviewsGrid = document.getElementById("reviewsGrid");
   refs.loadMoreReviewsBtn = document.getElementById("loadMoreReviewsBtn");
+
+  refs.reviewComposerTitle = document.getElementById("reviewComposerTitle");
+  refs.reviewComposerSubtitle = document.getElementById("reviewComposerSubtitle");
+  refs.reviewComposerNotice = document.getElementById("reviewComposerNotice");
+  refs.reviewLoginPrompt = document.getElementById("reviewLoginPrompt");
+  refs.reviewForm = document.getElementById("reviewForm");
+  refs.reviewComment = document.getElementById("reviewComment");
+  refs.reviewSubmitBtn = document.getElementById("reviewSubmitBtn");
+  refs.reviewDeleteBtn = document.getElementById("reviewDeleteBtn");
+  refs.reviewStarButtons = Array.from(document.querySelectorAll("[data-review-star]"));
 }
 
 function bindEvents() {
@@ -130,9 +152,7 @@ function bindEvents() {
     refs.loadMoreReviewsBtn.disabled = true;
 
     try {
-      const pageData = await fetchJson(
-        `/api/books/${state.bookId}/reviews?page=${nextPage}&size=${REVIEWS_PAGE_SIZE}`
-      );
+      const pageData = await fetchJson(buildReviewsUrl(nextPage));
       renderReviews(pageData, true);
     } catch (error) {
       console.error("Could not load more reviews:", error);
@@ -141,10 +161,49 @@ function bindEvents() {
       refs.loadMoreReviewsBtn.disabled = false;
     }
   });
+
+  refs.reviewStarButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedRating = Number(button.dataset.reviewStar || 0);
+      renderReviewInputStars();
+    });
+  });
+
+  refs.reviewForm.addEventListener("submit", handleReviewSubmit);
+  refs.reviewDeleteBtn.addEventListener("click", handleDeleteReview);
 }
 
 function getToken() {
   return localStorage.getItem("token");
+}
+
+function canManageOwnReview() {
+  return Boolean(
+    state.token &&
+    state.book &&
+    state.book.publicationStatus === "PUBLISHED" &&
+    !state.isBookOwner
+  );
+}
+
+function buildReviewsUrl(page) {
+  return `/api/books/${state.bookId}/reviews?page=${page}&size=${REVIEWS_PAGE_SIZE}&sort=updatedAt,desc`;
+}
+
+function buildAuthRequestOptions(method = "GET", body = null) {
+  const options = {
+    method,
+    headers: {
+      Authorization: `Bearer ${state.token}`
+    }
+  };
+
+  if (body !== null) {
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+
+  return options;
 }
 
 function parseErrorText(text, fallback) {
@@ -194,6 +253,19 @@ function formatDate(dateString) {
   return date.toLocaleDateString();
 }
 
+function formatDateTime(dateTimeString) {
+  if (!dateTimeString) return "";
+
+  const date = new Date(dateTimeString);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(date);
+}
+
 function buildFallbackLetter(title) {
   const first = (title ?? "B").trim().charAt(0).toUpperCase();
   return first || "B";
@@ -237,6 +309,16 @@ function renderStars(container, ratingValue) {
   }
 }
 
+function renderReviewInputStars() {
+  refs.reviewStarButtons.forEach((button) => {
+    const value = Number(button.dataset.reviewStar || 0);
+    const isActive = value <= state.selectedRating;
+
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
 function renderBookDetails(book) {
   refs.bookTitle.textContent = book.title || "Untitled Book";
 
@@ -264,6 +346,7 @@ function renderBookDetails(book) {
     refs.authorName.textContent = "—";
     refs.authorName.removeAttribute("href");
   }
+
   refs.publishDate.textContent = formatDate(book.publishDate);
   refs.seriesName.textContent = book.seriesName || "Standalone";
   refs.volumeNumber.textContent =
@@ -309,6 +392,53 @@ function renderBookDetails(book) {
   );
 }
 
+function renderReviewComposer() {
+  refs.reviewComposerNotice.hidden = true;
+  refs.reviewLoginPrompt.hidden = true;
+  refs.reviewForm.hidden = true;
+
+  if (!state.book || state.book.publicationStatus !== "PUBLISHED") {
+    refs.reviewComposerTitle.textContent = "Reviews unavailable";
+    refs.reviewComposerSubtitle.textContent = "Reviews are only available for published books.";
+    return;
+  }
+
+  if (!state.token) {
+    refs.reviewComposerTitle.textContent = "Want to leave a review?";
+    refs.reviewComposerSubtitle.textContent = "Log in to rate this book and share your thoughts.";
+    refs.reviewLoginPrompt.hidden = false;
+    return;
+  }
+
+  if (state.isBookOwner) {
+    refs.reviewComposerTitle.textContent = "Reviews by readers";
+    refs.reviewComposerSubtitle.textContent = "Authors cannot review their own books.";
+    refs.reviewComposerNotice.hidden = false;
+    refs.reviewComposerNotice.textContent = "You are the author of this book, so you cannot leave a review on it.";
+    return;
+  }
+
+  refs.reviewForm.hidden = false;
+
+  if (state.myReview) {
+    refs.reviewComposerTitle.textContent = "Your review";
+    refs.reviewComposerSubtitle.textContent = "You can update or delete your review at any time.";
+    state.selectedRating = state.myReview.rating || 0;
+    refs.reviewComment.value = state.myReview.comment || "";
+    refs.reviewSubmitBtn.textContent = "Update Review";
+    refs.reviewDeleteBtn.hidden = false;
+  } else {
+    refs.reviewComposerTitle.textContent = "Leave a review";
+    refs.reviewComposerSubtitle.textContent = "Each reader can leave one review per book.";
+    state.selectedRating = 0;
+    refs.reviewComment.value = "";
+    refs.reviewSubmitBtn.textContent = "Submit Review";
+    refs.reviewDeleteBtn.hidden = true;
+  }
+
+  renderReviewInputStars();
+}
+
 function handleDraftBook() {
   refs.bookNotice.hidden = false;
   refs.bookNotice.textContent =
@@ -325,6 +455,13 @@ function handleDraftBook() {
   refs.reviewsMeta.textContent = "Reviews are only available for published books.";
   refs.reviewsEmpty.hidden = false;
   refs.reviewsEmpty.textContent = "No public reviews are available for draft books.";
+  refs.loadMoreReviewsBtn.hidden = true;
+
+  refs.reviewCountInline.textContent = "0";
+  refs.ratingAverage.textContent = "—";
+  refs.ratingCount.textContent = "0 reviews";
+  renderStars(refs.ratingStars, 0);
+  renderReviewComposer();
 }
 
 function renderChapters(pageData) {
@@ -448,7 +585,7 @@ function renderReviewSummary(summary, reviewsPage) {
     refs.ratingAverage.textContent = averageRating.toFixed(1);
     renderStars(refs.ratingStars, averageRating);
   } else {
-    refs.ratingAverage.textContent = "—";
+    refs.ratingAverage.textContent = totalReviews > 0 ? "0.0" : "—";
     renderStars(refs.ratingStars, 0);
   }
 }
@@ -482,9 +619,16 @@ function renderReviews(pageData, append) {
     const card = document.createElement("article");
     card.className = "bv-review-card";
 
+    const head = document.createElement("div");
+    head.className = "bv-review-head";
+
     const user = document.createElement("p");
     user.className = "bv-review-user";
     user.textContent = review.username || "Anonymous";
+
+    const date = document.createElement("span");
+    date.className = "bv-review-date";
+    date.textContent = formatDateTime(review.updatedAt || review.createdAt);
 
     const stars = document.createElement("div");
     stars.className = "bv-stars";
@@ -497,7 +641,12 @@ function renderReviews(pageData, append) {
         ? review.comment
         : "This user left a rating without a written comment.";
 
-    card.appendChild(user);
+    head.appendChild(user);
+    if (date.textContent) {
+      head.appendChild(date);
+    }
+
+    card.appendChild(head);
     card.appendChild(stars);
     card.appendChild(text);
 
@@ -505,6 +654,103 @@ function renderReviews(pageData, append) {
   });
 
   refs.loadMoreReviewsBtn.hidden = state.reviewsPage >= state.reviewsTotalPages - 1;
+}
+
+async function refreshReviewData() {
+  const [reviewsPage, summary, myReview] = await Promise.all([
+    fetchJson(buildReviewsUrl(0)),
+    fetchJsonOrNull(`/api/books/${state.bookId}/reviews/summary`),
+    canManageOwnReview()
+      ? fetchJsonOrNull(`/api/books/${state.bookId}/reviews/me`, buildAuthRequestOptions())
+      : Promise.resolve(null)
+  ]);
+
+  state.myReview = myReview;
+  renderReviews(reviewsPage, false);
+  renderReviewSummary(summary, reviewsPage);
+  renderReviewComposer();
+}
+
+async function handleReviewSubmit(event) {
+  event.preventDefault();
+
+  if (!canManageOwnReview()) {
+    return;
+  }
+
+  if (!state.selectedRating || state.selectedRating < 1 || state.selectedRating > 5) {
+    alert("Please select a rating from 1 to 5 stars.");
+    return;
+  }
+
+  const comment = refs.reviewComment.value.trim();
+  const payload = {
+    rating: state.selectedRating,
+    comment
+  };
+
+  const isEditing = Boolean(state.myReview && state.myReview.reviewId);
+
+  refs.reviewSubmitBtn.disabled = true;
+  refs.reviewDeleteBtn.disabled = true;
+
+  try {
+    if (isEditing) {
+      await fetchJson(
+        `/api/reviews/${state.myReview.reviewId}`,
+        buildAuthRequestOptions("PATCH", payload)
+      );
+    } else {
+      await fetchJson(
+        `/api/books/${state.bookId}/reviews`,
+        buildAuthRequestOptions("POST", payload)
+      );
+    }
+
+    await refreshReviewData();
+
+    refs.reviewComposerNotice.hidden = false;
+    refs.reviewComposerNotice.textContent = isEditing
+      ? "Your review was updated successfully."
+      : "Your review was submitted successfully.";
+  } catch (error) {
+    console.error("Could not save review:", error);
+    alert(error.message || "Could not save your review.");
+  } finally {
+    refs.reviewSubmitBtn.disabled = false;
+    refs.reviewDeleteBtn.disabled = false;
+  }
+}
+
+async function handleDeleteReview() {
+  if (!state.myReview || !state.myReview.reviewId) {
+    return;
+  }
+
+  const confirmed = window.confirm("Are you sure you want to delete your review?");
+  if (!confirmed) return;
+
+  refs.reviewSubmitBtn.disabled = true;
+  refs.reviewDeleteBtn.disabled = true;
+
+  try {
+    await fetchJson(
+      `/api/reviews/${state.myReview.reviewId}`,
+      buildAuthRequestOptions("DELETE")
+    );
+
+    state.myReview = null;
+    await refreshReviewData();
+
+    refs.reviewComposerNotice.hidden = false;
+    refs.reviewComposerNotice.textContent = "Your review was deleted successfully.";
+  } catch (error) {
+    console.error("Could not delete review:", error);
+    alert(error.message || "Could not delete your review.");
+  } finally {
+    refs.reviewSubmitBtn.disabled = false;
+    refs.reviewDeleteBtn.disabled = false;
+  }
 }
 
 function openChapter(chapter) {
