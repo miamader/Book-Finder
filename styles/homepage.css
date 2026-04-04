@@ -32,12 +32,12 @@ body {
 
 /* Hero */
 .home-hero {
-  min-height: calc(100vh - 80px);
+  min-height: 72vh;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 36px;
-  padding: 0 90px 40px;
+  padding: 24px 90px 16px;
   box-sizing: border-box;
 }
 
@@ -134,7 +134,7 @@ body {
 
 /* Sections */
 .home-section {
-  padding: 44px 90px 10px;
+  padding: 28px 90px 8px;
   box-sizing: border-box;
 }
 
@@ -178,11 +178,11 @@ body {
 /* Popular */
 .popular-track {
   display: flex;
-  gap: 56px;
+  gap: 34px;
   align-items: flex-start;
   scroll-snap-type: x mandatory;
   width: max-content;
-  min-height: 320px;
+  min-height: 360px;
 }
 
 .home-inline-status {
@@ -192,7 +192,7 @@ body {
 }
 
 .book-tile {
-  width: 160px;
+  width: 190px;
   text-align: center;
   flex: 0 0 auto;
   scroll-snap-align: start;
@@ -203,12 +203,12 @@ body {
 }
 
 .tile-cover {
-  width: 160px;
-  height: 220px;
-  border-radius: 4px;
+  width: 190px;
+  height: 270px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 12px 26px rgba(0,0,0,0.12);
-  margin: 0 auto 14px;
+  margin: 0 auto 16px;
   background: #eee;
 }
 
@@ -279,14 +279,14 @@ body {
 
 .genre-card {
   flex: 0 0 auto;
-  min-width: 240px;
-  height: 140px;
-  border-radius: 8px;
+  min-width: 300px;
+  height: 170px;
+  border-radius: 10px;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px;
+  padding: 28px;
   box-sizing: border-box;
   color: #fff;
   overflow: hidden;
@@ -299,14 +299,14 @@ body {
 }
 
 .genre-text h3 {
-  margin: 0 0 6px;
-  font-size: 22px;
+  margin: 0 0 8px;
+  font-size: 26px;
   font-weight: 800;
 }
 
 .genre-text p {
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   opacity: 0.9;
 }
@@ -326,7 +326,7 @@ body {
 
 /* Start Writing */
 .writing-cta {
-  padding: 70px 90px;
+  padding: 42px 90px 56px;
   background: #fff;
 }
 
@@ -518,7 +518,7 @@ body {
   .home-hero {
     min-height: auto;
     align-items: flex-start;
-    padding: 32px 28px 40px;
+    padding: 24px 28px 20px;
     gap: 28px;
   }
 
@@ -535,7 +535,7 @@ body {
   }
 
   .home-section {
-    padding: 34px 28px 10px;
+    padding: 24px 28px 8px;
   }
 
   .popular-track {
@@ -543,11 +543,12 @@ body {
   }
 
   .genre-card {
-    min-width: 220px;
+    min-width: 250px;
+    height: 155px;
   }
 
   .writing-cta {
-    padding: 60px 28px;
+    padding: 36px 28px 50px;
   }
 
   .footer-top {
@@ -585,6 +586,15 @@ body {
     transform-origin: top left;
     margin-top: 8px;
   }
+
+  .book-tile {
+    width: 170px;
+  }
+
+  .tile-cover {
+    width: 170px;
+    height: 240px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -600,6 +610,29 @@ body {
     height: 280px;
     transform: scale(0.55);
     transform-origin: top left;
+  }
+
+  .book-tile {
+    width: 150px;
+  }
+
+  .tile-cover {
+    width: 150px;
+    height: 210px;
+  }
+
+  .genre-card {
+    min-width: 220px;
+    height: 145px;
+    padding: 22px;
+  }
+
+  .genre-text h3 {
+    font-size: 22px;
+  }
+
+  .genre-text p {
+    font-size: 13px;
   }
 
   .footer-inner {
