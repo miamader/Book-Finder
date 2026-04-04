@@ -36,14 +36,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 52px;
-  padding: 30px 90px 20px;
+  gap: 58px;
+  padding: 30px 112px 20px;
   box-sizing: border-box;
 }
 
 .hero-left {
-  width: 46%;
-  max-width: 560px;
+  width: 47%;
+  max-width: 590px;
+  margin-left: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -96,10 +97,11 @@ body {
 
 /* Book collage */
 .hero-right {
-  width: min(54%, 760px);
+  width: min(58%, 860px);
   position: relative;
-  height: 520px;
+  height: 560px;
   flex-shrink: 0;
+  margin-right: 22px;
 }
 
 .book-card {
@@ -117,12 +119,12 @@ body {
   display: block;
 }
 
-.book-1 { width: 175px; height: 250px; left: 10px;  top: 145px; --rot: -8deg; }
-.book-2 { width: 185px; height: 270px; left: 150px; top: 45px;  --rot:  5deg; }
-.book-3 { width: 180px; height: 255px; left: 430px; top: 20px;  --rot:  9deg; }
-.book-4 { width: 225px; height: 330px; left: 255px; top: 135px; --rot: 11deg; }
-.book-5 { width: 190px; height: 280px; left: 470px; top: 195px; --rot: -5deg; }
-.book-6 { width: 170px; height: 245px; left: 620px; top: 310px; --rot:  8deg; }
+.book-1 { width: 185px; height: 265px; left: 25px;  top: 155px; --rot: -8deg; }
+.book-2 { width: 195px; height: 285px; left: 175px; top: 50px;  --rot:  5deg; }
+.book-3 { width: 190px; height: 270px; left: 480px; top: 20px;  --rot:  9deg; }
+.book-4 { width: 240px; height: 350px; left: 290px; top: 145px; --rot: 11deg; }
+.book-5 { width: 200px; height: 295px; left: 525px; top: 205px; --rot: -5deg; }
+.book-6 { width: 180px; height: 260px; left: 690px; top: 320px; --rot:  8deg; }
 
 /* Bottom color bar */
 .bottom-decor-bar {
