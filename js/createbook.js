@@ -8,6 +8,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  const params = new URLSearchParams(window.location.search);
+  const bookIdFromUrl = params.get("bookId");
+  const isEditMode = !!bookIdFromUrl;
+
   const form = document.getElementById("bookForm");
   const titleInput = document.getElementById("title");
   const descInput = document.getElementById("desc");
@@ -23,10 +27,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const coverPlaceholder = document.getElementById("bookCoverPlaceholder");
   const coverName = document.getElementById("bookCoverName");
 
+  const formTitle = document.getElementById("bookFormTitle");
+  const formSubtitle = document.getElementById("bookFormSubtitle");
+  const formNote = document.getElementById("bookFormNote");
+  const statusRow = document.getElementById("bookStatusRow");
+  const statusBadge = document.getElementById("bookStatusBadge");
+
   let selectedFile = null;
   let tags = [];
   let allSeries = [];
   let selectedSeriesId = null;
+  let currentBookData = null;
+  let prefilledGenreId = null;
 
   function getTodayDate() {
     return new Date().toISOString().split("T")[0];
@@ -87,20 +99,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function addTag() {
-    const value = tagInput.value.trim().replace(/^#/, "");
+    const value = tagInput.value.trim().replace(/^#/, "").toLowerCase();
 
     if (!value) return;
-
-    const normalized = value.toLowerCase();
-
-    if (tags.includes(normalized)) {
+    if (tags.includes(value)) {
       tagInput.value = "";
       return;
     }
 
-    tags.push(normalized);
+    tags.push(value);
     tagInput.value = "";
     renderTags();
+  }
+
+  function setCoverPreview(src, labelText = "") {
+    if (!src) {
+      coverPreview.style.display = "none";
+      coverPreview.removeAttribute("src");
+      coverPlaceholder.style.display = "flex";
+      coverName.textContent = "";
+      return;
+    }
+
+    coverPreview.src = src;
+    coverPreview.style.display = "block";
+    coverPlaceholder.style.display = "none";
+    coverName.textContent = labelText;
   }
 
   function populateGenres(genres) {
@@ -115,9 +139,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function populateSeriesSelect(seriesList) {
+    const safeSeriesList = Array.isArray(seriesList) ? seriesList : [];
+
     seriesSelect.innerHTML = `<option value="">Standalone book</option>`;
 
-    seriesList.forEach((series) => {
+    safeSeriesList.forEach((series) => {
       const option = document.createElement("option");
       option.value = series.seriesId;
       option.textContent = series.seriesName;
@@ -175,6 +201,85 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  function applyBookData(book) {
+    currentBookData = book;
+
+    titleInput.value = book.title ?? "";
+    descInput.value = book.summary ?? "";
+
+    tags = Array.isArray(book.hashtags)
+      ? [...book.hashtags].map((tag) => String(tag).toLowerCase())
+      : [];
+    renderTags();
+
+    selectedSeriesId = book.seriesId ?? null;
+    seriesSelect.value = selectedSeriesId !== null ? String(selectedSeriesId) : "";
+    renderSeriesCards();
+
+    const genreIds = Array.isArray(book.genreIds) ? book.genreIds.map(Number) : [];
+    if (genreIds.length > 0) {
+      prefilledGenreId = genreIds[0];
+      categorySelect.value = String(prefilledGenreId);
+    }
+
+    if (book.coverUrl) {
+      setCoverPreview(book.coverUrl, "Current cover");
+    } else {
+      setCoverPreview(null);
+    }
+
+    statusRow.hidden = false;
+    statusBadge.textContent = book.publicationStatus ?? "DRAFT";
+
+    document.title = "BookFinder | Edit Book";
+    formTitle.textContent = "Edit Book";
+    formSubtitle.textContent = "Update your book details, cover, tags, and series assignment.";
+    formNote.textContent = "You can update your draft or published book from here.";
+    submitBtn.textContent = "Save Changes →";
+  }
+
+  function buildGenreIdsForSubmit() {
+    const selectedGenreId = Number(categorySelect.value);
+    if (!selectedGenreId) return [];
+
+    const existingGenreIds = Array.isArray(currentBookData?.genreIds)
+      ? currentBookData.genreIds.map(Number)
+      : [];
+
+    if (
+      isEditMode &&
+      existingGenreIds.length > 1 &&
+      prefilledGenreId !== null &&
+      selectedGenreId === Number(prefilledGenreId)
+    ) {
+      return existingGenreIds;
+    }
+
+    return [selectedGenreId];
+  }
+
+  function buildPayload({ includeCoverImageKey = false, coverImageKey = null } = {}) {
+    const payload = {
+      title: titleInput.value.trim(),
+      summary: descInput.value.trim(),
+      publishDate: isEditMode
+        ? (currentBookData?.publishDate ?? getTodayDate())
+        : getTodayDate(),
+      genreIds: buildGenreIdsForSubmit(),
+      hashtags: tags
+    };
+
+    if (selectedSeriesId !== null) {
+      payload.seriesId = selectedSeriesId;
+    }
+
+    if (includeCoverImageKey) {
+      payload.coverImageKey = coverImageKey;
+    }
+
+    return payload;
+  }
+
   async function loadGenres() {
     const response = await fetch(`${BOOKS_API_BASE}/api/genres`);
 
@@ -205,6 +310,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderSeriesCards();
   }
 
+  async function fetchBookDetails(bookId) {
+    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}/details`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to load book details"));
+    }
+
+    return response.json();
+  }
+
   async function createBook(payload) {
     const response = await fetch(`${BOOKS_API_BASE}/api/books/create`, {
       method: "POST",
@@ -218,6 +338,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(parseErrorText(errorText, "Failed to create book"));
+    }
+
+    return response.json();
+  }
+
+  async function updateBook(bookId, payload) {
+    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to update book"));
+    }
+
+    return response.json();
+  }
+
+  async function removeBookFromSeries(bookId) {
+    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}/remove-series`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to remove book from series"));
     }
 
     return response.json();
@@ -264,37 +418,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  async function updateBookCover(bookId, coverImageKey, publishDate) {
-    const payload = {
-      title: titleInput.value.trim(),
-      summary: descInput.value.trim(),
-      publishDate,
-      genreIds: [Number(categorySelect.value)],
-      hashtags: tags,
-      coverImageKey
-    };
-
-    if (selectedSeriesId !== null) {
-      payload.seriesId = selectedSeriesId;
-    }
-
-    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}/update`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(parseErrorText(errorText, "Failed to save cover image"));
-    }
-
-    return response.json();
-  }
-
   addTagBtn.addEventListener("click", addTag);
 
   tagInput.addEventListener("keydown", (event) => {
@@ -309,18 +432,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectedFile = file || null;
 
     if (!file) {
-      coverPreview.style.display = "none";
-      coverPreview.removeAttribute("src");
-      coverPlaceholder.style.display = "flex";
-      coverName.textContent = "";
+      if (currentBookData?.coverUrl) {
+        setCoverPreview(currentBookData.coverUrl, "Current cover");
+      } else {
+        setCoverPreview(null);
+      }
       return;
     }
 
     const objectUrl = URL.createObjectURL(file);
-    coverPreview.src = objectUrl;
-    coverPreview.style.display = "block";
-    coverPlaceholder.style.display = "none";
-    coverName.textContent = file.name;
+    setCoverPreview(objectUrl, file.name);
   });
 
   form.addEventListener("submit", async (event) => {
@@ -328,8 +449,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const title = titleInput.value.trim();
     const summary = descInput.value.trim();
-    const genreId = Number(categorySelect.value);
-    const publishDate = getTodayDate();
+    const genreIds = buildGenreIdsForSubmit();
 
     if (!title) {
       alert("Please enter a title.");
@@ -343,7 +463,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if (!genreId) {
+    if (genreIds.length === 0) {
       alert("Please select a category.");
       categorySelect.focus();
       return;
@@ -351,21 +471,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     submitBtn.disabled = true;
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Creating...";
+    submitBtn.textContent = isEditMode ? "Saving..." : "Creating...";
 
     try {
-      const createPayload = {
-        title,
-        summary,
-        publishDate,
-        genreIds: [genreId],
-        hashtags: tags,
-        coverImageKey: null
-      };
+      if (isEditMode) {
+        let coverImageKey = null;
 
-      if (selectedSeriesId !== null) {
-        createPayload.seriesId = selectedSeriesId;
+        if (selectedFile) {
+          const uploadData = await requestCoverUpload(bookIdFromUrl, selectedFile);
+          const { objectKey, uploadUrl } = uploadData;
+
+          if (!objectKey || !uploadUrl) {
+            throw new Error("Cover upload response is missing data.");
+          }
+
+          await uploadFileToPresignedUrl(uploadUrl, selectedFile);
+          coverImageKey = objectKey;
+        }
+
+        const originalSeriesId = currentBookData?.seriesId ?? null;
+
+        if (originalSeriesId !== null && selectedSeriesId === null) {
+          await removeBookFromSeries(bookIdFromUrl);
+        }
+
+        const payload = buildPayload({
+          includeCoverImageKey: !!coverImageKey,
+          coverImageKey
+        });
+
+        await updateBook(bookIdFromUrl, payload);
+
+        alert("Book updated successfully.");
+        window.location.href = "managebooks.html";
+        return;
       }
+
+      const createPayload = buildPayload({
+        includeCoverImageKey: false
+      });
 
       const createdBook = await createBook(createPayload);
 
@@ -378,14 +522,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await uploadFileToPresignedUrl(uploadUrl, selectedFile);
-        await updateBookCover(createdBook.bookId, objectKey, publishDate);
+
+        const updatePayload = buildPayload({
+          includeCoverImageKey: true,
+          coverImageKey: objectKey
+        });
+
+        await updateBook(createdBook.bookId, updatePayload);
       }
 
       alert("Book created successfully.");
       window.location.href = `writebook.html?bookId=${createdBook.bookId}`;
     } catch (error) {
       console.error(error);
-      alert(error.message || "Could not create the book.");
+      alert(error.message || (isEditMode ? "Could not update the book." : "Could not create the book."));
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
@@ -394,8 +544,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     await Promise.all([loadGenres(), loadMySeries()]);
+
+    if (isEditMode) {
+      const book = await fetchBookDetails(bookIdFromUrl);
+      applyBookData(book);
+    }
   } catch (error) {
     console.error(error);
-    alert(error.message || "Could not load the create book form.");
+    alert(error.message || "Could not load the book form.");
   }
 });
