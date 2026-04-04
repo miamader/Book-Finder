@@ -126,3 +126,30 @@ button {
 .seg-2 { background-color: #F38181; }
 .seg-3 { background-color: #F05454; }
 .seg-4 { background-color: #300101; }
+
+.auth-header {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+}
+
+.auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.auth-brand img {
+    height: 40px;
+}
+
+.auth-brand span {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+}
+
+.auth-brand:hover {
+    opacity: 0.8;
+}
