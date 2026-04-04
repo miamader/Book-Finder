@@ -28,7 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   let allSeries = [];
   let selectedSeriesId = null;
 
-  function getImageFormat(file) {
+  function getTodayDate() {
+    return new Date().toISOString().split("T")[0];
+  }
+
+  function getFileTypeEnum(file) {
     if (!file) return null;
     if (file.type === "image/png") return "PNG";
     if (file.type === "image/jpeg") return "JPEG";
@@ -46,6 +50,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       .slice(0, 60);
 
     return `${safeName || "cover"}${ext.toLowerCase()}`;
+  }
+
+  function parseErrorText(text, fallbackMessage) {
+    if (!text || !text.trim()) return fallbackMessage;
+
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed === "string") return parsed;
+      if (parsed.message) return parsed.message;
+      if (parsed.error) return parsed.error;
+      return fallbackMessage;
+    } catch {
+      return text;
+    }
   }
 
   function renderTags() {
@@ -72,88 +90,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const value = tagInput.value.trim().replace(/^#/, "");
 
     if (!value) return;
-    if (tags.includes(value)) {
+
+    const normalized = value.toLowerCase();
+
+    if (tags.includes(normalized)) {
       tagInput.value = "";
       return;
     }
 
-    tags.push(value);
+    tags.push(normalized);
     tagInput.value = "";
     renderTags();
-  }
-
-  addTagBtn.addEventListener("click", addTag);
-
-  tagInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === ",") {
-      event.preventDefault();
-      addTag();
-    }
-  });
-
-  coverInput.addEventListener("change", () => {
-    const file = coverInput.files?.[0];
-    selectedFile = file || null;
-
-    if (!file) {
-      coverPreview.style.display = "none";
-      coverPreview.removeAttribute("src");
-      coverPlaceholder.style.display = "flex";
-      coverName.textContent = "";
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    coverPreview.src = objectUrl;
-    coverPreview.style.display = "block";
-    coverPlaceholder.style.display = "none";
-    coverName.textContent = file.name;
-  });
-
-  function parseErrorText(text, fallbackMessage) {
-    if (!text) return fallbackMessage;
-
-    try {
-      const parsed = JSON.parse(text);
-      if (typeof parsed === "string") return parsed;
-      if (parsed.message) return parsed.message;
-      return fallbackMessage;
-    } catch {
-      return text;
-    }
-  }
-
-  async function loadGenres() {
-    const response = await fetch(`${BOOKS_API_BASE}/api/genres`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(parseErrorText(errorText, "Failed to load genres"));
-    }
-
-    const genres = await response.json();
-    populateGenres(genres);
-  }
-
-  async function loadMySeries() {
-    const response = await fetch(`${BOOKS_API_BASE}/api/series/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(parseErrorText(errorText, "Failed to load your series"));
-    }
-
-    allSeries = await response.json();
-    populateSeriesSelect(allSeries);
-    renderSeriesCards();
   }
 
   function populateGenres(genres) {
@@ -183,7 +130,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const standaloneBtn = document.createElement("button");
     standaloneBtn.type = "button";
-    standaloneBtn.className = `cb-series-card cb-series-card-standalone ${selectedSeriesId === null ? "is-selected" : ""}`;
+    standaloneBtn.className = `cb-series-card cb-series-card-standalone ${
+      selectedSeriesId === null ? "is-selected" : ""
+    }`;
     standaloneBtn.innerHTML = `
       <img class="cb-series-card-cover" src="svg_files/bookfinder logo.svg" alt="Standalone book" />
       <div class="cb-series-card-meta">
@@ -226,8 +175,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  async function loadGenres() {
+    const response = await fetch(`${BOOKS_API_BASE}/api/genres`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to load genres"));
+    }
+
+    const genres = await response.json();
+    populateGenres(genres);
+  }
+
+  async function loadMySeries() {
+    const response = await fetch(`${BOOKS_API_BASE}/api/series/me?page=0&size=100`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(parseErrorText(errorText, "Failed to load your series"));
+    }
+
+    const data = await response.json();
+    allSeries = Array.isArray(data) ? data : (data.content ?? []);
+    populateSeriesSelect(allSeries);
+    renderSeriesCards();
+  }
+
   async function createBook(payload) {
-    const response = await fetch(`${BOOKS_API_BASE}/api/books`, {
+    const response = await fetch(`${BOOKS_API_BASE}/api/books/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -246,23 +225,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function requestCoverUpload(bookId, file) {
     const safeFileName = slugifyFileName(file.name);
-    const imageFormat = getImageFormat(file);
+    const fileType = getFileTypeEnum(file);
 
-    if (!imageFormat) {
+    if (!fileType) {
       throw new Error("Only PNG and JPEG cover images are supported.");
     }
 
-    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}/cover-upload`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        fileName: safeFileName,
-        imageFormat
-      })
-    });
+    const response = await fetch(
+      `${BOOKS_API_BASE}/api/books/${bookId}/cover/upload-url?filename=${encodeURIComponent(safeFileName)}&fileType=${fileType}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -287,21 +264,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  async function updateBookCover(bookId, coverImageKey) {
-    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}`, {
+  async function updateBookCover(bookId, coverImageKey, publishDate) {
+    const payload = {
+      title: titleInput.value.trim(),
+      summary: descInput.value.trim(),
+      publishDate,
+      genreIds: [Number(categorySelect.value)],
+      hashtags: tags,
+      coverImageKey
+    };
+
+    if (selectedSeriesId !== null) {
+      payload.seriesId = selectedSeriesId;
+    }
+
+    const response = await fetch(`${BOOKS_API_BASE}/api/books/${bookId}/update`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({
-        title: titleInput.value.trim(),
-        description: descInput.value.trim(),
-        genreIds: [Number(categorySelect.value)],
-        hashtagNames: tags,
-        seriesId: selectedSeriesId,
-        coverImageKey
-      })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
@@ -312,12 +295,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     return response.json();
   }
 
+  addTagBtn.addEventListener("click", addTag);
+
+  tagInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === ",") {
+      event.preventDefault();
+      addTag();
+    }
+  });
+
+  coverInput.addEventListener("change", () => {
+    const file = coverInput.files?.[0];
+    selectedFile = file || null;
+
+    if (!file) {
+      coverPreview.style.display = "none";
+      coverPreview.removeAttribute("src");
+      coverPlaceholder.style.display = "flex";
+      coverName.textContent = "";
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    coverPreview.src = objectUrl;
+    coverPreview.style.display = "block";
+    coverPlaceholder.style.display = "none";
+    coverName.textContent = file.name;
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const title = titleInput.value.trim();
-    const description = descInput.value.trim();
+    const summary = descInput.value.trim();
     const genreId = Number(categorySelect.value);
+    const publishDate = getTodayDate();
 
     if (!title) {
       alert("Please enter a title.");
@@ -325,7 +337,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if (!description) {
+    if (!summary) {
       alert("Please enter a description.");
       descInput.focus();
       return;
@@ -342,18 +354,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     submitBtn.textContent = "Creating...";
 
     try {
-      const createdBook = await createBook({
+      const createPayload = {
         title,
-        description,
+        summary,
+        publishDate,
         genreIds: [genreId],
-        hashtagNames: tags,
-        seriesId: selectedSeriesId
-      });
+        hashtags: tags,
+        coverImageKey: null
+      };
+
+      if (selectedSeriesId !== null) {
+        createPayload.seriesId = selectedSeriesId;
+      }
+
+      const createdBook = await createBook(createPayload);
 
       if (selectedFile) {
         const uploadData = await requestCoverUpload(createdBook.bookId, selectedFile);
-        await uploadFileToPresignedUrl(uploadData.uploadUrl, selectedFile);
-        await updateBookCover(createdBook.bookId, uploadData.coverImageKey);
+        const { objectKey, uploadUrl } = uploadData;
+
+        if (!objectKey || !uploadUrl) {
+          throw new Error("Cover upload response is missing data.");
+        }
+
+        await uploadFileToPresignedUrl(uploadUrl, selectedFile);
+        await updateBookCover(createdBook.bookId, objectKey, publishDate);
       }
 
       alert("Book created successfully.");
