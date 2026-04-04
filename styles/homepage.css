@@ -97,33 +97,6 @@ body {
   flex-shrink: 0;
 }
 
-.hero-brand-badge {
-  position: absolute;
-  top: 18px;
-  left: 40px;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-}
-
-.hero-brand-badge img {
-  width: 32px;
-  height: 32px;
-  display: block;
-}
-
-.hero-brand-badge span {
-  font-size: 20px;
-  font-weight: 700;
-  color: #111;
-}
-
 .book-card {
   position: absolute;
   border-radius: 10px;
@@ -605,16 +578,6 @@ body {
     height: 280px;
     transform: scale(0.55);
     transform-origin: top left;
-  }
-
-  .hero-brand-badge {
-    left: 12px;
-    top: 0;
-    padding: 10px 12px;
-  }
-
-  .hero-brand-badge span {
-    font-size: 18px;
   }
 
   .footer-inner {
