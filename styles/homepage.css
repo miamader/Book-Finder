@@ -182,6 +182,13 @@ body {
   align-items: flex-start;
   scroll-snap-type: x mandatory;
   width: max-content;
+  min-height: 320px;
+}
+
+.home-inline-status {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
 }
 
 .book-tile {
@@ -189,6 +196,10 @@ body {
   text-align: center;
   flex: 0 0 auto;
   scroll-snap-align: start;
+}
+
+.tile-cover-link {
+  text-decoration: none;
 }
 
 .tile-cover {
@@ -206,6 +217,17 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.tile-cover-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: #eee7e4;
+  color: #7a6f6f;
+  font-size: 56px;
+  font-weight: 700;
 }
 
 .tile-title {
