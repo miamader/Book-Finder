@@ -32,35 +32,39 @@ body {
 
 /* Hero */
 .home-hero {
-  min-height: 72vh;
+  min-height: 68vh;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 36px;
-  padding: 24px 90px 16px;
+  gap: 52px;
+  padding: 30px 90px 20px;
   box-sizing: border-box;
 }
 
 .hero-left {
-  width: 50%;
-  max-width: 640px;
+  width: 46%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .hero-title {
   font-family: 'Georgia', serif;
-  font-size: clamp(72px, 6vw, 92px);
+  font-size: clamp(56px, 5vw, 78px);
   line-height: 1.08;
-  margin: 0 0 22px 0;
+  margin: 0 0 20px 0;
   font-weight: 500;
   color: #111;
 }
 
 .hero-subtitle {
-  margin: 0 0 34px 0;
+  margin: 0 0 32px 0;
   color: #222;
-  font-size: 18px;
-  line-height: 1.65;
-  max-width: 560px;
+  font-size: 17px;
+  line-height: 1.7;
+  max-width: 500px;
 }
 
 .hero-cta {
@@ -76,6 +80,7 @@ body {
   font-weight: 600;
   color: #111;
   overflow: hidden;
+  align-self: center;
 }
 
 .cta-arrow {
@@ -91,9 +96,9 @@ body {
 
 /* Book collage */
 .hero-right {
-  width: min(60%, 860px);
+  width: min(54%, 760px);
   position: relative;
-  height: 560px;
+  height: 520px;
   flex-shrink: 0;
 }
 
@@ -112,17 +117,17 @@ body {
   display: block;
 }
 
-.book-1 { width: 190px; height: 270px; left: 10px;  top: 130px; --rot: -8deg;  }
-.book-2 { width: 200px; height: 290px; left: 160px; top: 30px;  --rot:  5deg;  }
-.book-3 { width: 195px; height: 275px; left: 470px; top: 0;     --rot:  9deg;  }
-.book-4 { width: 240px; height: 350px; left: 275px; top: 120px; --rot: 11deg; }
-.book-5 { width: 205px; height: 295px; left: 505px; top: 180px; --rot: -5deg;  }
-.book-6 { width: 185px; height: 265px; left: 655px; top: 290px; --rot:  8deg;  }
+.book-1 { width: 175px; height: 250px; left: 10px;  top: 145px; --rot: -8deg; }
+.book-2 { width: 185px; height: 270px; left: 150px; top: 45px;  --rot:  5deg; }
+.book-3 { width: 180px; height: 255px; left: 430px; top: 20px;  --rot:  9deg; }
+.book-4 { width: 225px; height: 330px; left: 255px; top: 135px; --rot: 11deg; }
+.book-5 { width: 190px; height: 280px; left: 470px; top: 195px; --rot: -5deg; }
+.book-6 { width: 170px; height: 245px; left: 620px; top: 310px; --rot:  8deg; }
 
 /* Bottom color bar */
 .bottom-decor-bar {
   width: 100%;
-  height: 30px;
+  height: 22px;
   display: flex;
 }
 
@@ -134,7 +139,7 @@ body {
 
 /* Sections */
 .home-section {
-  padding: 28px 90px 8px;
+  padding: 34px 90px 10px;
   box-sizing: border-box;
 }
 
@@ -147,7 +152,7 @@ body {
 
 .section-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #111;
 }
@@ -178,11 +183,11 @@ body {
 /* Popular */
 .popular-track {
   display: flex;
-  gap: 34px;
+  gap: 30px;
   align-items: flex-start;
   scroll-snap-type: x mandatory;
   width: max-content;
-  min-height: 360px;
+  min-height: 330px;
 }
 
 .home-inline-status {
@@ -192,7 +197,7 @@ body {
 }
 
 .book-tile {
-  width: 190px;
+  width: 180px;
   text-align: center;
   flex: 0 0 auto;
   scroll-snap-align: start;
@@ -203,8 +208,8 @@ body {
 }
 
 .tile-cover {
-  width: 190px;
-  height: 270px;
+  width: 180px;
+  height: 250px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 12px 26px rgba(0,0,0,0.12);
@@ -232,9 +237,9 @@ body {
 
 .tile-title {
   margin: 0 0 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.4px;
   color: #111;
   white-space: nowrap;
   overflow: hidden;
@@ -245,47 +250,29 @@ body {
   margin: 0;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.4px;
   color: var(--red);
-}
-
-/* Dots */
-.dots {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin: 18px 0 0;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.15);
-}
-
-.dot.active {
-  background: var(--red);
+  text-transform: uppercase;
 }
 
 /* Genres */
 .genre-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 26px;
+  gap: 24px;
   width: 100%;
 }
 
 .genre-card {
   width: 100%;
   min-width: 0;
-  height: 220px;
+  height: 180px;
   border-radius: 12px;
   text-decoration: none;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 34px;
+  padding: 28px;
   box-sizing: border-box;
   color: #fff;
   overflow: hidden;
@@ -298,7 +285,7 @@ body {
 
 .genre-text h3 {
   margin: 0;
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
 }
 
@@ -306,22 +293,14 @@ body {
   display: none;
 }
 
-.genre-icon {
-  font-size: 42px;
-  opacity: 0.9;
-}
-
 .genre-card.horror   { background: #4b0606; }
 .genre-card.fantasy  { background: #ff3b3b; }
 .genre-card.romance  { background: #ffb3b8; color: #111; }
-.genre-card.romance .genre-text p { color: rgba(0,0,0,0.7); }
 .genre-card.scifi    { background: #ff5a66; }
-.genre-card.mystery  { background: #812a1f; }
-.genre-card.thriller { background: #7b2d00; }
 
 /* Start Writing */
 .writing-cta {
-  padding: 42px 90px 56px;
+  padding: 46px 90px 58px;
   background: #fff;
 }
 
@@ -351,8 +330,8 @@ body {
 
 .writing-subtitle {
   margin: 0 0 22px 0;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.7;
   color: #222;
   max-width: 520px;
 }
@@ -512,37 +491,33 @@ body {
 @media (max-width: 1280px) {
   .home-hero {
     min-height: auto;
-    align-items: flex-start;
+    align-items: center;
     padding: 24px 28px 20px;
-    gap: 28px;
+    gap: 34px;
   }
 
   .hero-left {
-    width: min(100%, 540px);
+    width: min(100%, 520px);
   }
 
   .hero-title {
-    font-size: clamp(60px, 6vw, 76px);
+    font-size: clamp(52px, 5vw, 68px);
   }
 
   .hero-subtitle {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .hero-right {
-    width: min(100%, 760px);
+    width: min(100%, 700px);
     height: 460px;
-    transform: scale(0.85);
+    transform: scale(0.88);
     transform-origin: top center;
     margin: 0 auto;
   }
 
   .home-section {
-    padding: 24px 28px 8px;
-  }
-
-  .popular-track {
-    gap: 24px;
+    padding: 28px 28px 8px;
   }
 
   .genre-row {
@@ -550,12 +525,12 @@ body {
   }
 
   .genre-card {
-    height: 190px;
-    padding: 28px;
+    height: 170px;
+    padding: 24px;
   }
 
   .genre-text h3 {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   .writing-cta {
@@ -583,7 +558,8 @@ body {
 @media (max-width: 1024px) {
   .home-hero {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
 
   .hero-left,
@@ -591,43 +567,13 @@ body {
     width: 100%;
   }
 
+  .hero-left {
+    align-items: center;
+    text-align: center;
+  }
+
   .hero-title {
-    font-size: clamp(54px, 8vw, 72px);
-  }
-
-  .hero-subtitle {
-    font-size: 16px;
-  }
-
-  .hero-right {
-    height: 420px;
-    transform: scale(0.78);
-    transform-origin: top left;
-    margin-top: 8px;
-  }
-
-  .book-tile {
-    width: 170px;
-  }
-
-  .tile-cover {
-    width: 170px;
-    height: 240px;
-  }
-
-  .genre-card {
-    height: 170px;
-    padding: 24px;
-  }
-
-  .genre-text h3 {
-    font-size: 26px;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-title {
-    font-size: clamp(42px, 10vw, 56px);
+    font-size: clamp(46px, 7vw, 62px);
   }
 
   .hero-subtitle {
@@ -635,18 +581,62 @@ body {
   }
 
   .hero-right {
-    height: 280px;
-    transform: scale(0.55);
-    transform-origin: top left;
+    height: 400px;
+    transform: scale(0.78);
+    transform-origin: top center;
+    margin-top: 8px;
   }
 
   .book-tile {
-    width: 150px;
+    width: 165px;
   }
 
   .tile-cover {
-    width: 150px;
-    height: 210px;
+    width: 165px;
+    height: 230px;
+  }
+
+  .genre-card {
+    height: 155px;
+    padding: 22px;
+  }
+
+  .genre-text h3 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-hero {
+    padding: 22px 18px 18px;
+    gap: 24px;
+  }
+
+  .hero-title {
+    font-size: clamp(38px, 10vw, 52px);
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+  }
+
+  .hero-right {
+    height: 260px;
+    transform: scale(0.58);
+    transform-origin: top center;
+  }
+
+  .home-section {
+    padding: 24px 18px 8px;
+  }
+
+  .book-tile {
+    width: 145px;
+  }
+
+  .tile-cover {
+    width: 145px;
+    height: 205px;
   }
 
   .genre-row {
@@ -654,12 +644,12 @@ body {
   }
 
   .genre-card {
-    height: 160px;
-    padding: 24px;
+    height: 145px;
+    padding: 22px;
   }
 
   .genre-text h3 {
-    font-size: 26px;
+    font-size: 24px;
   }
 
   .footer-inner {
