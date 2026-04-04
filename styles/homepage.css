@@ -97,11 +97,13 @@ body {
 
 /* Book collage */
 .hero-right {
-  width: min(58%, 860px);
+  width: min(62%, 940px);
   position: relative;
-  height: 560px;
+  height: 620px;
   flex-shrink: 0;
-  margin-right: 22px;
+  margin-right: 0;
+  transform: translateX(-30px) scale(1.12);
+  transform-origin: center center;
 }
 
 .book-card {
