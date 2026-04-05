@@ -62,7 +62,9 @@ class BookFinderNav extends HTMLElement {
             </div>
 
             <div class="nav-avatar-wrapper">
-              <div class="nav-avatar"></div>
+              <div class="nav-avatar">
+                <img src="svg_files/default_profile.svg" alt="Profile">
+            </div>
 
               <div class="nav-dropdown" hidden>
                 <div class="nav-dropdown-name">User</div>

@@ -215,17 +215,29 @@ bf-navbar {
 }
 
 .nav-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ffcc80, #90caf9);
-  border: 2px solid rgba(255,255,255,.75);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(0,0,0,.08);
   cursor: pointer;
-  transition: opacity .15s;
+
+  transition: opacity .15s ease;
 }
 
 .nav-avatar:hover {
   opacity: .85;
+}
+
+.nav-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ===== PROFILE DROPDOWN ===== */
