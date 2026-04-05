@@ -359,21 +359,16 @@ function renderBookDetails(book) {
       ? book.summary
       : "No description has been added yet.";
 
-  if (book.coverUrl) {
-    refs.bookCoverImg.src = book.coverUrl;
-    refs.bookCoverImg.hidden = false;
-    refs.bookCoverFallback.hidden = true;
+  const resolvedCover = book.coverUrl || "svg_files/bookfinder logo.svg";
 
-    refs.bookCoverImg.addEventListener("error", () => {
-      refs.bookCoverImg.hidden = true;
-      refs.bookCoverFallback.hidden = false;
-      refs.bookCoverFallback.textContent = buildFallbackLetter(book.title);
-    }, { once: true });
-  } else {
-    refs.bookCoverImg.hidden = true;
-    refs.bookCoverFallback.hidden = false;
-    refs.bookCoverFallback.textContent = buildFallbackLetter(book.title);
-  }
+  refs.bookCoverImg.src = resolvedCover;
+  refs.bookCoverImg.hidden = false;
+  refs.bookCoverFallback.hidden = true;
+
+  refs.bookCoverImg.onerror = () => {
+    refs.bookCoverImg.onerror = null;
+    refs.bookCoverImg.src = "svg_files/bookfinder logo.svg";
+  };
 
   renderChipList(
     refs.genreTags,
