@@ -248,12 +248,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  function buildCoverPlaceholder(title) {
-    const placeholder = document.createElement("div");
-    placeholder.className = "sr-card-cover sr-card-cover-placeholder";
-    placeholder.textContent = (title ?? "B").trim().charAt(0).toUpperCase() || "B";
-    return placeholder;
-  }
+ function buildCoverPlaceholder(title) {
+   const img = document.createElement("img");
+   img.className = "sr-card-cover";
+   img.src = "svg_files/bookfinder logo.svg";
+   img.alt = `${title ?? "Book"} default cover`;
+   return img;
+ }
 
   function createBookCard(book) {
     const card = document.createElement("article");
