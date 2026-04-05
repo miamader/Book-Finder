@@ -75,10 +75,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function buildCoverPlaceholder(title) {
-    const placeholder = document.createElement("div");
-    placeholder.className = "cover cover-placeholder";
-    placeholder.textContent = (title ?? "B").trim().charAt(0).toUpperCase() || "B";
-    return placeholder;
+    const img = document.createElement("img");
+    img.className = "cover-image";
+    img.src = "svg_files/bookfinder logo.svg";
+    img.alt = `${title ?? "Book"} default cover`;
+    return img;
   }
 
   function createBookItem(book, mode) {

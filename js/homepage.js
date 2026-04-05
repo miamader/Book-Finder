@@ -76,11 +76,9 @@ function renderPopularBooks(container, books) {
 }
 
 function buildCoverFallback(title) {
-  const fallback = document.createElement("div");
-  fallback.className = "tile-cover-fallback";
-
-  const firstLetter = (title ?? "B").trim().charAt(0).toUpperCase() || "B";
-  fallback.textContent = firstLetter;
-
-  return fallback;
+  const img = document.createElement("img");
+  img.src = "svg_files/bookfinder logo.svg";
+  img.alt = `${title ?? "Book"} default cover`;
+  img.className = "tile-cover-default";
+  return img;
 }
