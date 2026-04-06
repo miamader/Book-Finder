@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Finder | Book View</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/global.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/bookview.css" />
+
+    <script type="module" src="components/navbar.js"></script>
+    <script src="js/bookview.js" defer></script>
+</head>
+<body>
+<bf-navbar active="browse"></bf-navbar>
+
+<main class="bv-main">
+    <div class="bv-wrap">
+        <section id="pageLoading" class="bv-state">
+            <div class="bv-spinner" aria-hidden="true"></div>
+            <p>Loading book details...</p>
+        </section>
+
+        <section id="pageError" class="bv-state bv-state-error" hidden>
+            <h1>Could not load this book</h1>
+            <p id="pageErrorText">Please try again.</p>
+        </section>
+
+        <article id="bookPage" hidden>
+            <header class="bv-header">
+                <div class="bv-header-copy">
+                    <p id="bookEyebrow" class="bv-eyebrow">Book Details</p>
+                    <h1 id="bookTitle" class="bv-title">Book Title</h1>
+                    <p id="bookSubtitle" class="bv-subtitle">Loading book information...</p>
+                </div>
+
+                <div class="bv-header-side">
+                    <span id="publicationBadge" class="bv-badge">Published</span>
+                </div>
+            </header>
+
+            <section class="bv-hero">
+                <div class="bv-cover-panel">
+                    <div id="bookCoverFrame" class="bv-cover-frame">
+                        <img id="bookCoverImg" class="bv-cover-img" alt="Book cover" hidden />
+                        <div id="bookCoverFallback" class="bv-cover-fallback">B</div>
+                    </div>
+                </div>
+
+                <div class="bv-info-panel">
+                    <div class="bv-info-grid">
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Author</span>
+                            <a id="authorName" class="bv-info-value bv-info-link" href="#">—</a>
+                        </div>
+
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Published</span>
+                            <span id="publishDate" class="bv-info-value">—</span>
+                        </div>
+
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Series</span>
+                            <span id="seriesName" class="bv-info-value">Standalone</span>
+                        </div>
+
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Volume</span>
+                            <span id="volumeNumber" class="bv-info-value">—</span>
+                        </div>
+
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Chapters</span>
+                            <span id="chapterCount" class="bv-info-value">0</span>
+                        </div>
+
+                        <div class="bv-info-item">
+                            <span class="bv-info-label">Reviews</span>
+                            <span id="reviewCountInline" class="bv-info-value">0</span>
+                        </div>
+                    </div>
+
+                    <div class="bv-actions">
+                        <button id="startReadingBtn" class="bv-btn bv-btn-primary" type="button">
+                            Start Reading
+                        </button>
+                        <button id="previewBtn" class="bv-btn bv-btn-secondary" type="button" hidden>
+                            Read Preview
+                        </button>
+                        <button id="tocBtn" class="bv-btn bv-btn-secondary" type="button">
+                            Go to Table of Contents
+                        </button>
+                    </div>
+
+                    <div id="bookNotice" class="bv-notice" hidden></div>
+
+                    <div class="bv-chip-block">
+                        <p class="bv-chip-title">Genres</p>
+                        <div id="genreTags" class="bv-chip-list"></div>
+                    </div>
+
+                    <div class="bv-chip-block">
+                        <p class="bv-chip-title">Hashtags</p>
+                        <div id="hashtagTags" class="bv-chip-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bv-section">
+                <h2 class="bv-section-title">Description</h2>
+                <p id="bookDescription" class="bv-description">—</p>
+            </section>
+
+            <section id="chaptersSection" class="bv-section">
+                <div class="bv-section-head">
+                    <div>
+                        <h2 class="bv-section-title">Table of Contents</h2>
+                        <p id="chaptersMeta" class="bv-section-subtitle">Loading chapters...</p>
+                    </div>
+                </div>
+
+                <div id="chaptersEmpty" class="bv-empty" hidden>
+                    No chapters are available yet.
+                </div>
+
+                <div id="chaptersList" class="bv-chapter-list"></div>
+            </section>
+
+            <section class="bv-section">
+                <div class="bv-section-head">
+                    <div>
+                        <h2 class="bv-section-title">Reviews</h2>
+                        <p id="reviewsMeta" class="bv-section-subtitle">Loading reviews...</p>
+                    </div>
+
+                    <div class="bv-rating-summary">
+                        <div id="ratingStars" class="bv-stars" aria-label="Average rating"></div>
+                        <span id="ratingAverage" class="bv-rating-average">0.0</span>
+                        <span id="ratingCount" class="bv-rating-count">0 reviews</span>
+                    </div>
+                </div>
+
+                <div class="bv-my-review-card">
+                    <div class="bv-my-review-head">
+                        <div>
+                            <h3 id="reviewComposerTitle" class="bv-my-review-title">Leave a review</h3>
+                            <p id="reviewComposerSubtitle" class="bv-my-review-subtitle">
+                                Each reader can leave one review per book.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="reviewComposerNotice" class="bv-notice" hidden></div>
+
+                    <div id="reviewLoginPrompt" class="bv-review-login" hidden>
+                        <div class="bv-review-login-copy">
+                            <p class="bv-review-login-title">Want to rate this book?</p>
+                            <p class="bv-review-login-text">
+                                Log in to leave a review and share your thoughts with other readers.
+                            </p>
+                        </div>
+
+                        <div class="bv-review-login-actions">
+                            <a class="bv-btn bv-btn-primary" href="login.html">Log In</a>
+                            <a class="bv-btn bv-btn-secondary" href="signup.html">Sign Up</a>
+                        </div>
+                    </div>
+
+                    <form id="reviewForm" class="bv-review-form" hidden>
+                        <div class="bv-field">
+                            <span class="bv-field-label">Your rating</span>
+                            <div class="bv-input-stars" role="group" aria-label="Select your rating">
+                                <button type="button" class="bv-input-star" data-review-star="1" aria-label="1 star">★</button>
+                                <button type="button" class="bv-input-star" data-review-star="2" aria-label="2 stars">★</button>
+                                <button type="button" class="bv-input-star" data-review-star="3" aria-label="3 stars">★</button>
+                                <button type="button" class="bv-input-star" data-review-star="4" aria-label="4 stars">★</button>
+                                <button type="button" class="bv-input-star" data-review-star="5" aria-label="5 stars">★</button>
+                            </div>
+                        </div>
+
+                        <div class="bv-field">
+                            <label class="bv-field-label" for="reviewComment">Comment</label>
+                            <textarea
+                                    id="reviewComment"
+                                    class="bv-textarea"
+                                    maxlength="2000"
+                                    placeholder="Write what you thought about this book..."
+                            ></textarea>
+                        </div>
+
+                        <div class="bv-form-actions">
+                            <button id="reviewSubmitBtn" class="bv-btn bv-btn-primary" type="submit">
+                                Submit Review
+                            </button>
+                            <button id="reviewDeleteBtn" class="bv-btn bv-btn-danger" type="button" hidden>
+                                Delete Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="reviewsEmpty" class="bv-empty" hidden>
+                    No reviews yet.
+                </div>
+
+                <div id="reviewsGrid" class="bv-review-grid"></div>
+
+                <button id="loadMoreReviewsBtn" class="bv-btn bv-btn-outline" type="button" hidden>
+                    Show more reviews
+                </button>
+            </section>
+        </article>
+    </div>
+</main>
+</body>
+</html>

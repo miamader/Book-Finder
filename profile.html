@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BookFinder | Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/global.css" />
+  <link rel="stylesheet" href="styles/navbar.css" />
+  <link rel="stylesheet" href="styles/profile.css"/>
+  <script type="module" src="components/navbar.js"></script>
+  <script src="js/profile.js" defer></script>
+</head>
+<body>
+<bf-navbar active="home"></bf-navbar>
+
+<main class="pf-page">
+  <div class="pf-wrap">
+    <section id="profileLoading" class="pf-state">
+      <div class="pf-spinner" aria-hidden="true"></div>
+      <p>Loading profile...</p>
+    </section>
+
+    <section id="profileError" class="pf-state pf-state-error" hidden>
+      <h1>Could not load this profile</h1>
+      <p id="profileErrorText">Please try again.</p>
+    </section>
+
+    <section id="profileContent" hidden>
+      <header class="pf-hero">
+        <div class="pf-avatar" id="profileAvatar">U</div>
+
+        <div class="pf-hero-copy">
+          <p id="profileEyebrow" class="pf-eyebrow">Author Profile</p>
+          <h1 id="profileUsername" class="pf-username">Username</h1>
+          <p id="profileFullname" class="pf-fullname">No name added yet</p>
+
+          <div class="pf-meta-grid">
+            <div class="pf-meta-item">
+              <span class="pf-meta-label">Joined</span>
+              <span id="profileJoined" class="pf-meta-value">—</span>
+            </div>
+
+            <div class="pf-meta-item" id="profileEmailCard" hidden>
+              <span class="pf-meta-label">Email</span>
+              <span id="profileEmail" class="pf-meta-value">—</span>
+            </div>
+
+            <div class="pf-meta-item">
+              <span class="pf-meta-label">Published Books</span>
+              <span id="profileBookCount" class="pf-meta-value">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pf-hero-actions">
+          <button id="editProfileBtn" class="pf-btn pf-btn-primary" type="button" hidden>
+            Edit Profile
+          </button>
+        </div>
+      </header>
+
+      <section id="profileNotice" class="pf-notice" hidden></section>
+
+      <section class="pf-section">
+        <div class="pf-section-head">
+          <h2 class="pf-section-title">Bio</h2>
+        </div>
+        <p id="profileBio" class="pf-bio">User hasn't created a bio yet.</p>
+      </section>
+
+      <section id="editSection" class="pf-section" hidden>
+        <div class="pf-section-head">
+          <h2 class="pf-section-title">Edit Profile</h2>
+        </div>
+
+        <form id="profileForm" class="pf-form">
+          <div class="pf-form-grid">
+            <label class="pf-field">
+              <span>First name</span>
+              <input id="firstNameInput" type="text" maxlength="80" />
+            </label>
+
+            <label class="pf-field">
+              <span>Last name</span>
+              <input id="lastNameInput" type="text" maxlength="80" />
+            </label>
+          </div>
+
+          <label class="pf-field">
+            <span>Bio</span>
+            <textarea id="bioInput" rows="6" maxlength="1600"></textarea>
+          </label>
+
+          <div class="pf-form-actions">
+            <button id="saveProfileBtn" class="pf-btn pf-btn-primary" type="submit">Save Changes</button>
+            <button id="cancelEditBtn" class="pf-btn pf-btn-secondary" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="pf-section">
+        <div class="pf-section-head">
+          <div>
+            <h2 class="pf-section-title">Books Created by This Author</h2>
+            <p id="booksMeta" class="pf-section-subtitle">Loading books...</p>
+          </div>
+        </div>
+
+        <div id="booksEmpty" class="pf-empty" hidden>
+          No published books yet.
+        </div>
+
+        <div id="booksGrid" class="pf-books-grid"></div>
+      </section>
+    </section>
+  </div>
+</main>
+</body>
+</html>
