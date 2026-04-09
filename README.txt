@@ -1,7 +1,7 @@
 ================================================================================
 README.txt
 BookFinder – CS (Computer Science)
-FIU Senior Capstone II – Spring 2026
+FIU Capstone II – Spring 2026
 ================================================================================
 
 PROJECT OVERVIEW
@@ -276,7 +276,6 @@ FUTURE IMPLEMENTATIONS
   - Downloadable book files after purchase
   - User reading lists and book organization
   - Profile display of favorite books and currently reading status
-  - (more to be added)
 
 ================================================================================
 REPOSITORIES
